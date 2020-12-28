@@ -1,0 +1,25 @@
+1.請你簡單介紹你的工作經驗(or 這三年內)
+    在目前這的這份工作,部門為藍牙IC 的firmware 及 software 開發.
+    我負責的工作內容為自動化相關軟體或是環境開發,如
+        配合專案開發新的自動化測試工具,例如藍牙的官方認證測試
+        或是將既有的手動測試自動化,使用的程式語言為Python 
+        參與建構大型自動化測試環境以及維護改善,如透過CI system 驅動開發中的 project firmware day to day 測試
+    另外,會基於以前工作經驗提供建議,協助同事除錯或是測試計畫安排
+    
+    之前的工作性質比較屬於QA工程師,大部分需要手動執行Project 的測試項目
+    因為在之前的工作有帶過約四人的測試團隊
+    所以除了測試工作外,也需負責提供測試計畫,以及測試計畫所執行時間
+    或是改善既有的測試方式或流程,讓產品測試更嚴謹
+    
+    在擔任QA工程師期間,負責工作範圍較廣,除了熟悉系統的測試手法外
+    也具備了相當程度的硬體電路知識,及熟悉產品生產流程
+    因為具有足夠手動測試經驗,對於我在開發自動化測試工具或是除錯方面都有相當大的幫助
+    
+2.如何提供產品測試計畫
+
+3.How would you unit test the code you write
+
+4.What interesting inputs or test cases can you think of
+
+5.How would you design end to end, integration, or performance tests for a real world system, for example Gmail? 
+    
