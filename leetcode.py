@@ -2392,6 +2392,26 @@ class LeetCode:
 
         return "Dire" if len(D) != 0 else "Radiant"
 
+    def reachNumber(self, target):
+        '''
+        :param target: int
+        :return: int
+        leetcode medium: 754. Reach a Number
+        '''
+        t = abs(target)
+
+        n = int(((1 + 8 * t) ** 0.5 - 1) / 2)
+
+        LT = n * (n + 1) // 2
+
+        if LT == t:
+            return n
+
+        if (LT + n + 1 - t) % 2 == 0:
+            return n + 1
+
+        return n + 3 - n % 2
+
     def numMagicSquaresInside(self, grid):
         '''
         :param grid:List[List[int]]
