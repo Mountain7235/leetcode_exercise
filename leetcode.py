@@ -770,6 +770,27 @@ class LeetCode:
 
         return sum(output)
 
+    def moveZeroes(self, nums):
+        '''
+        :param nums: List[int]
+        :return: None
+        leetcode easy: 283. Move Zeroes
+        Duobple pointer
+        '''
+        """
+        Do not return anything, modify nums in-place instead.
+        """
+        index = 0
+
+        for i in range(len(nums)):
+            if nums[i] != 0:
+                nums[index] = nums[i]
+                index += 1
+
+        if index:
+            for i in range(index, len(nums)):
+                nums[i] = 0
+
     def reverseString(self, s):
         '''
         :param s: List[str]
@@ -979,7 +1000,7 @@ class LeetCode:
 
         return A
 
-    def smallestRangeII(self, A, K: int) -> int:
+    def smallestRangeII(self, A, K):
         '''
         :param A: List[int]
         :param K: int
@@ -1021,6 +1042,26 @@ class LeetCode:
         dfs(root, L, R)
 
         return self.total
+
+    def validMountainArray(self, arr):
+        '''
+        :param arr: List[int]
+        :return: bool
+        leetcode easy: 941. Valid Mountain Array
+        '''
+        n = len(arr)
+
+        if n < 3 or arr[0] > arr[1] or arr[-1] > arr[-2]:
+            return False
+
+        i = 1
+        while arr[i - 1] < arr[i]:
+            i += 1
+
+        while i < n and arr[i - 1] > arr[i]:
+            i += 1
+
+        return i == n
 
     def allCellsDistOrder(self, R, C, r0, c0):
         '''
@@ -1170,13 +1211,33 @@ class LeetCode:
             ans.append(k)
         return len(set(ans)) == 1
 
+    def checkIfExist(self, arr):
+        '''
+        :param arr: List[int]
+        :return: bool
+        leetcode easy: 1346. Check If N and Its Double Exist
+        '''
+        if len(arr) < 1:
+            return False
+
+        if arr.count(0) > 1:
+            return True
+
+        if 0 in arr:
+            arr.pop(arr.index(0))
+
+        for i in arr:
+            if i * 2 in set(arr):
+                return True
+
+        return False
+
     def luckyNumbers(self, matrix):
         '''
         :param matrix: List[List[int]]
         :return: List[int]
         leetcode easy: 1380. Lucky Numbers in a Matrix
         '''
-
         '''
         min_matrix = []
 
@@ -2119,6 +2180,17 @@ class LeetCode:
         '''
         :param matrix: List[List[int]]
         :return: List[int]
+        leetcode medium: 498. Diagonal Traverse
+        '''
+        '''
+        Input:
+        [
+         [ 1, 2, 3 ],
+         [ 4, 5, 6 ],
+         [ 7, 8, 9 ]
+        ]
+        
+        Output:  [1,2,4,7,5,3,6,8,9]
         '''
         if not matrix:
             return []
@@ -2581,6 +2653,32 @@ class LeetCode:
         for _ in range(n):
             a, e, i, o, u = a+e+i+o+u, e+i+o+u, i+o+u, o+u, u
         return a
+
+    def findBall(self, grid):
+        '''
+        :param grid: List[List[int]]
+        :return: List[int]
+        leetcode medium: 1706. Where Will the Ball Fall
+        '''
+        m, n = len(grid), len(grid[0])
+        answer = list(range(n))
+
+        for r in range(m):
+            for i in range(n):
+                c = answer[i]
+
+                if c == -1:
+                    continue
+
+                c_nxt = c + grid[r][c]
+
+                if c_nxt < 0 or c_nxt >= n or grid[r][c_nxt] == -grid[r][c]:
+                    answer[i] = -1
+                    continue
+
+                answer[i] += grid[r][c]
+
+        return answer
     # endregion
 
     # region Hard level
@@ -2600,6 +2698,60 @@ class LeetCode:
             return (nums1[(l // 2) - 1] + nums1[l // 2]) / 2
         else:
             return nums1[(l + 1) // 2 - 1]
+
+    def minJumps(self, arr):
+        '''
+        :param arr: List[int]
+        :return: int
+        leetcode Hard: 1345. Jump Game IV
+        '''
+        n = len(arr)
+
+        # Connect all indexes that have the same value.
+        connections = collections.defaultdict(list)
+
+        for i, num in enumerate(arr):
+            connections[num].append(i)
+
+        # Breadth First Search layer by layer using lists
+        distance = 0
+        layer = [0]
+        visited = {0}
+
+        while layer:
+            next_layer = []
+
+            for i in layer:
+                # Return the distance if we have arrived at the last index.
+                if i == n - 1:
+                    return distance
+
+                # Add the direct unvisited neighbors of i to the stack.
+                if i > 0 and i - 1 not in visited:
+                    next_layer.append(i - 1)
+                    visited.add(i - 1)
+                if i + 1 < n and i + 1 not in visited:
+                    next_layer.append(i + 1)
+                    visited.add(i + 1)
+
+                # Add all unvisited connected indexes that share the
+                # same value to the stack.
+                if arr[i] in connections:
+                    for j in connections[arr[i]]:
+                        if j not in visited:
+                            next_layer.append(j)
+                            visited.add(j)
+
+                    # The earliest possibility to visit the nodes in
+                    # connections[arr[i]] has been found. Therefore
+                    # we can now discard the list to prevent further
+                    # visits.
+                    del connections[arr[i]]
+
+            distance += 1
+            layer = next_layer
+
+        return -1
 
     # endregion
 
@@ -2956,6 +3108,24 @@ class DP:
                 dp[i][j] = min(dp[i - 1][j] + 1, dp[i][j - 1] + 1, dp[i - 1][j - 1] + (word1[i - 1] != word2[j - 1]))
 
         return dp[-1][-1]
+
+    def numDecodings(self, s):
+        '''
+        :param s: str
+        :return: int
+        leetcode medium: 91. Decode Ways
+        '''
+        dp = [0] * (len(s) + 1)
+        dp[0] = 1
+
+        for i in range(1, len(dp)):
+            if s[i-1] != '0':
+                dp[i] = dp[i-1]
+
+            if i != 1 and '09' < s[i-2:i] < '27':
+                dp[i] += dp[i-2]
+
+        return dp[-1]
 
     def minimumTotal(self,triangle):
         '''
