@@ -1985,6 +1985,53 @@ class LeetCode:
 
         return l if l != float('inf') else 0
 
+    def gameOfLife(self, board):
+        '''
+        :param board: List[List[int]]
+        :return: None
+        leetcode medium: 289. Game of Life
+        '''
+        """
+        Do not return anything, modify board in-place instead.
+        """
+        copy = []
+
+        for i in range(len(board)):
+
+            arr = []
+            for j in range(len(board[0])):
+                arr.append(board[i][j])
+
+            copy.append(arr)
+
+        m = len(board)
+        n = len(board[0])
+
+        for row in range(m):
+            for col in range(n):
+                cell = copy[row][col]
+
+                sum = 0
+
+                for r in range(row - 1, row + 2):
+                    for c in range(col - 1, col + 2):
+                        if (r >= 0 and r < m) and (c >= 0 and c < n):
+                            sum += copy[r][c]
+
+                sum -= cell
+
+                if sum < 2 and cell == 1:
+                    board[row][col] = 0
+
+                elif (sum == 2 or sum == 3) and cell == 1:
+                    board[row][col] = 1
+
+                elif sum > 3 and cell == 1:
+                    board[row][col] = 0
+
+                elif sum == 3 and cell == 0:
+                    board[row][col] = 1
+
     def getHint(self, secret, guess):
         '''
         :param secret: str
