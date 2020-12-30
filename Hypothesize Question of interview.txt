@@ -11,15 +11,67 @@
     所以除了測試工作外,也需負責提供測試計畫,以及測試計畫所執行時間
     或是改善既有的測試方式或流程,讓產品測試更嚴謹
     
-    在擔任QA工程師期間,負責工作範圍較廣,除了熟悉系統的測試手法外
-    也具備了相當程度的硬體電路知識,及熟悉產品生產流程
-    因為具有足夠手動測試經驗,對於我在開發自動化測試工具或是除錯方面都有相當大的幫助
+    在擔任QA工程師期間,負責工作範圍較廣,除工作上所需的測試知識及技巧
+    也學習了相當程度的硬體電路知識
+    因測試經驗的累積,也負責的協助客戶釐清產品生產問題
+    更因具有足夠手動測試經驗,對於我在開發自動化測試工具或是除錯方面都有相當大的幫助
     
-2.如何提供產品測試計畫
-
-3.How would you unit test the code you write
-
-4.What interesting inputs or test cases can you think of
-
-5.How would you design end to end, integration, or performance tests for a real world system, for example Gmail? 
+2.你認為對於自動化測試,最重要的是什麼?   
+    自動化測試我認為最重要的有幾個要點
+    1.自動化架構設計以及模組化
+        一開始自動化的框架設計不夠完整,例如測試的companmet相依性太高
+        容易產生companmet修改,造成無法相容的問題
+        所以架構模組化我認為是很重要的
     
+    2.另外重要的便是除錯以及測試數據收集或是測試報告呈現
+      測試時間長或是測試數量巨大的往往交由自動化測時環境負責
+      所以當test case fail 時,能夠提供修正產品的訊息或是詳細的測試報告
+      也是自動化測試需要注意的
+      
+    3.最後一點也是我認為自動化測試最重要的
+      好的自動化測試架構應該基於手動的測試經驗之上
+      有完整的手動測試步驟,以及需要注意的要領
+      可以讓自動化測試架構更完整,也更容易實踐測試自動化
+
+3.如何提供產品測試計畫
+    1.清楚的產品規格,包含有所需要測試的所有companmet,以及
+      測試環境軟硬體的準備還有各個companmet所對應的人員窗口
+      
+    2.結構性測試,每一個需要被測試的companmet都需要一個獨立相依性低的測試
+      目的在於能夠確保待測物的功能都有依照規格設計達到要求
+      如果為產品開發前期,能夠較為快速的將問題除錯,且修復的成本較低
+      
+    3.功能性測試,產品依照格設計測試過關,再來則需要各種不同的測試條件
+      測試待測物是否有預期功能
+      
+    4.整合測試 integration,將所有companmet組合相依性高或是以最終產品應用進行測試
+      目的為各companmet之間的介面是否正確
+      
+    5.系統測試,產品在真實系統或是不同系統平台的應用
+      目的為經過整合測試後的待測物,在真實系統或是不同系統平台功能應用是否正常
+    
+    6.壓力測試及效能測試,長時間的反覆測試或是超越產品規格的極限測試條件使用
+      目的多在於測試數據的收集,有利於下一代產品的開發
+      或是產品效能評估
+      
+    7.測試時間評估以及測試報告提供
+
+4.How would you unit test the code you write or How would you test the code you write
+  What interesting inputs or test cases can you think of
+  1. basic inputs/output :
+     依照最簡單的輸入參數,確認輸出條件是否正確
+     
+  2. function structure:
+     使用assert 確認function 在執行的過程中
+     參數數值型態是否正確
+     
+  3. 極限值或是不正確的參數輸入
+     測試function 是否能夠正確輸出或是判斷錯誤
+     以及極限狀態下,function 執行時間是否過長
+     
+  4. 引用測試,function若可以被引用
+     測試在其他function 下執行,是否有相依性的錯誤發生
+
+How would you design end to end, integration, or performance tests for a real world system, for example Gmail? 
+  
+  
