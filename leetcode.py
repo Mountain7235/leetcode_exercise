@@ -9,132 +9,6 @@ class ListNode:
         self.val = x
         self.next = None
 
-class keysandrooms:
-    # True  = [[1],[2],[3],[]]
-    # False = [[1,3],[3,0,1],[2],[0]]
-    def canVisitAllRoomsDFS1(self, rooms):
-        """
-        :type rooms: List[List[int]]
-        :rtype: bool
-        """
-        q, path = [0], [0]
-        while q:
-            index = q.pop()
-            for v in rooms[index]:
-                if v not in path:
-                    q.append(v)
-                    path.append(v)
-        return len(path) == len(rooms)
-
-    def canVisitAllRoomsDFS2(self, rooms):
-        """
-        :type rooms: List[List[int]]
-        :rtype: bool
-        """
-        return len(self.dfs2(rooms, [])) == len(rooms)
-
-    def dfs2(self, rooms, path, source=0):
-        path += [source]
-        for i in rooms[source]:
-            if i not in path:
-                self.dfs2(rooms, path, i)
-        return path
-
-    def canVisitAllRoomsBFS(self, rooms):
-        """
-        :type rooms: List[List[int]]
-        :rtype: bool
-        """
-        q, path = [0], [0]
-        while q:
-            index = q.pop(0)
-            for v in rooms[index]:
-                if v not in path:
-                    q.append(v)
-                    path.append(v)
-        return len(path) == len(rooms)
-
-class Island:
-    def numIslands1(self,grid):
-        """
-        :type grid: List[List[str]]
-        :rtype: int
-        """
-        res = 0
-        for r in range(len(grid)):
-            for c in range(len(grid[0])):
-                if grid[r][c] == "1":
-                    self.dfs1(grid, r, c)
-                    res += 1
-        return res
-
-    def dfs1(self,grid, i, j):
-        dirs = [[-1, 0], [0, 1], [0, -1], [1, 0]]
-        grid[i][j] = "0"
-        for dir in dirs:
-            nr, nc = i + dir[0], j + dir[1]
-            if nr >= 0 and nc >= 0 and nr < len(grid) and nc < len(grid[0]):
-                if grid[nr][nc] == "1":
-                    self.dfs1(grid, nr, nc)
-
-    def numIslands2(self, grid):
-        if not grid or len(grid) == 0:
-            return 0
-
-        row, columns = len(grid), len(grid[0])
-        count = 0
-        for i in range(row):
-            for j in range(columns):
-                if grid[i][j] == '1':
-                    self.dfs2(grid, i, j, row, columns)
-                    count += 1
-        return count
-
-    def dfs2(self, grid, i, j, row, columns):
-        if i >= row or i < 0 or j >= columns or j < 0 or grid[i][j] == '0':
-            return
-        grid[i][j] = '0'
-        self.dfs2(grid, i - 1, j, row, columns)
-        self.dfs2(grid, i, j - 1, row, columns)
-        self.dfs2(grid, i + 1, j, row, columns)
-        self.dfs2(grid, i, j + 1, row, columns)
-
-    def numIslands3(self, grid):
-        '''
-        grid = [['1','1','1','1','0'],
-                ['1','1','0','1','0'],
-                ['1','1','0','0','0'],
-                ['0','0','0','0','0']]
-        :param grid: List[List[str]
-        :return: int
-        '''
-        if not grid or not grid[0]:
-            return 0
-        visited = [[False] * len(grid[0]) for _ in range(len(grid))]
-        res = 0
-
-        for i in range(len(grid)):
-            for j in range(len(grid[0])):
-                if grid[i][j] == '1' and not visited[i][j]:
-                    res += 1
-                    self.dfs3(grid, visited, i, j)
-        return res
-
-    def dfs3(self, grid, visited, i, j):
-        '''
-        :param grid: List[List[str]]
-        :param visited: List[List[bool]]
-        :param i: int
-        :param j: int
-        :return: None
-        '''
-        if i >= 0 and j >= 0 and i < len(grid) and j < len(grid[0]) and not visited[i][j] and grid[i][j] == '1':
-            visited[i][j] = True
-            self.dfs3(grid, visited, i + 1, j)
-            self.dfs3(grid, visited, i - 1, j)
-            self.dfs3(grid, visited, i, j + 1)
-            self.dfs3(grid, visited, i, j - 1)
-
 class TreeNode:
     def __init__(self, val=0, left=None, right=None):
         self.val = val
@@ -1309,6 +1183,26 @@ class LeetCode:
             else:
                 sum += (row[i] + row[len(row)-i-1])
         return sum
+
+    def canFormArray(self, arr, pieces):
+        '''
+        :param arr: List[int]
+        :param pieces: List[List[int]]
+        :return: bool
+        leetcode easy:  1640. Check Array Formation Through Concatenation
+        Input: arr = [49,18,16], pieces = [[16,18,49]] ,Output: false
+        Input: arr = [91,4,64,78], pieces = [[78],[4,64],[91]], Output: true
+        '''
+        mapping = {}
+        for piece in pieces:
+            mapping[piece[0]] = piece
+
+        ans = []
+        for num in arr:
+            if num in mapping:
+                ans += mapping[num]
+
+        return ans == arr
     # endregion
 
     # region medium level
@@ -1917,9 +1811,8 @@ class LeetCode:
         :return: List[List[str]]
         leetcode medium: 131. Palindrome Partitioning
         '''
-        ans = []
 
-        def dfs(currList, k):
+        def dfs(currList, k, ans):
             if k == len(s):
                 ans.append(currList)
                 return
@@ -1927,9 +1820,10 @@ class LeetCode:
             for i in range(k, len(s)):
                 tmpStr = s[k:i + 1]
                 if tmpStr == tmpStr[::-1]:
-                    dfs(currList + [tmpStr], i + 1)
+                    dfs(currList + [tmpStr], i + 1, ans)
 
-        dfs([], 0)
+        ans = []
+        dfs([], 0, ans)
 
         return ans
 
@@ -1947,6 +1841,39 @@ class LeetCode:
             a = nums.pop(-1)
             nums.insert(0,a)
             k-=1
+
+    def numIslands(self, grid):
+        '''
+        :param grid: List[List[str]]
+        :return: int
+        leetcode medium: 200. Number of Islands
+                grid = [['1','1','1','1','0'],
+                ['1','1','0','1','0'],
+                ['1','1','0','0','0'],
+                ['0','0','0','0','0']]
+        '''
+        def dfs(grid, i, j):
+            grid[i][j] = '0'
+
+            checks = [[0, -1], [0, 1], [-1, 0], [1, 0]]
+
+            for check in checks:
+                nr = i + check[0]
+                nc = j + check[1]
+
+                if 0 <= nr < len(grid) and 0 <= nc < len(grid[0]):
+                    if grid[nr][nc] == '1':
+                        dfs(grid, nr, nc)
+
+        cnt = 0
+
+        for r in range(len(grid)):
+            for c in range(len(grid[0])):
+                if grid[r][c] == '1':
+                    cnt += 1
+                    dfs(grid, r, c)
+
+        return cnt
 
     def rangeBitwiseAnd(self, m, n):
         '''
@@ -2501,6 +2428,25 @@ class LeetCode:
                     count += 1
         return count
 
+    def canVisitAllRooms(self, rooms):
+        """
+        :type rooms: List[List[int]]
+        :rtype: bool
+        leetcode medium: 841. Keys and Rooms
+        Input: [[1],[2],[3],[]] ,Output: true
+        Input: [[1,3],[3,0,1],[2],[0]], Output: false
+        """
+        q, path = [0], [0]
+
+        while q:
+            index = q.pop()
+            for v in rooms[index]:
+                if v not in path:
+                    q.append(v)
+                    path.append(v)
+
+        return len(path) == len(rooms)
+
     def decodeAtIndex(self, S, K):
         '''
         :param S: str
@@ -2765,6 +2711,24 @@ class LeetCode:
             return (nums1[(l // 2) - 1] + nums1[l // 2]) / 2
         else:
             return nums1[(l + 1) // 2 - 1]
+
+    def largestRectangleArea(self, heights):
+        '''
+        :param heights: List[int]
+        :return: int
+        leetcode Hard: 84. Largest Rectangle in Histogram
+        '''
+        heights.append(0)
+        stack, area = [], 0
+
+        for i in range(len(heights)):
+            while stack and heights[stack[-1]] >= heights[i]:
+                h = heights[stack.pop()]
+                w = i if not stack else i - stack[-1] - 1
+                area = max(area, h * w)
+
+            stack.append(i)
+        return area
 
     def minJumps(self, arr):
         '''
