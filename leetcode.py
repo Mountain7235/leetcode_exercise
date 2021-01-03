@@ -459,21 +459,16 @@ class LeetCode:
         :return: List[List[int]]
         leetcode easy: 118. Pascal's Triangle
         '''
-        ans = []
-        if not numRows:
-            return ans
+        output = [[] for _ in range(numRows)]
 
         for i in range(numRows):
-            ans.append([])
-            ans[i].append(1)
+            for j in range(i + 1):
+                if 0 < j < i:
+                    output[i].append(output[i - 1][j - 1] + output[i - 1][j])
+                else:
+                    output[i].append(1)
 
-            for j in range(1, i):
-                ans[i].append(ans[i - 1][j - 1] + ans[i - 1][j])
-
-            if numRows != 0 and len(ans) !=1:
-                ans[i].append(1)
-
-        return ans
+        return output
 
     def maxProfit(self, prices):
         '''
@@ -1722,8 +1717,6 @@ class LeetCode:
         :return: List[List[int]]
         leetcode medium: 77. Combinations
         '''
-        res = []  # 1
-
         def dfs(nums, k, index, path, res):  # 4
             if k == 0:  # 7
                 res.append(path)  # 8
@@ -1731,6 +1724,8 @@ class LeetCode:
 
             for i in range(index, len(nums)):  # 10
                 dfs(nums, k - 1, i + 1, path + [nums[i]], res)  # 11
+
+        res = []  # 1
 
         dfs(range(1, n + 1), k, 0, [], res)  # 2
 
@@ -3168,18 +3163,19 @@ class DP:
         if not triangle:
             return 0
 
-        m = len(triangle)
-        dp = [[0] * (n+1) for n in range(m)]
-        dp[0][0] = triangle[0][0]
-        for i in range(1,m):
-            dp[i][0] = dp[i-1][0] + triangle[i][0]
-            dp[i][i] = dp[i-1][i-1]+triangle[i][i]
+        for i in range(len(triangle)):
+            for j in range(len(triangle[i])):
+                if not i == 0:
+                    if j == 0:
+                        triangle[i][j] += triangle[i - 1][j]
 
-        for i in range(1,m):
-            for j in range(1,i):
-                dp[i][j] = min(dp[i-1][j-1],dp[i-1][j]) + triangle[i][j]
+                    elif j == i: # j == last index == i[-1]
+                        triangle[i][j] += triangle[i - 1][j - 1]
 
-        return min(dp[-1])
+                    else:
+                        triangle[i][j] += min(triangle[i - 1][j - 1], triangle[i - 1][j])
+
+        return min(triangle[-1])
 
     def wordBreak(self, s, wordDict):
         '''
