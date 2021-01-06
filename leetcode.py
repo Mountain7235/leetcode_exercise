@@ -1165,6 +1165,23 @@ class LeetCode:
 
         return (1 + (high - low) // 2)
 
+    def findKthPositive(self, arr, k):
+        '''
+        :param arr: List[int]
+        :param k: int
+        :return: int
+        leetcode easy: 1539. Kth Missing Positive Number
+        '''
+        num = 0
+        count = 0
+
+        while count < k:
+            num += 1
+            if num not in arr:
+                count += 1
+
+        return num
+
     def diagonalSum(self, mat):
         '''
         :param mat: List[List[int]]
@@ -1418,6 +1435,40 @@ class LeetCode:
                 return 0x7fffffff
         return ans if not flag else -ans
 
+    def isValidSudoku(self, board):
+        '''
+        :param board: List[List[str]]
+        :return: bool
+        leetcode medium: 36. Valid Sudoku
+        Input: board =  [["5","3",".",".","7",".",".",".","."]
+                        ,["6",".",".","1","9","5",".",".","."]
+                        ,[".","9","8",".",".",".",".","6","."]
+                        ,["8",".",".",".","6",".",".",".","3"]
+                        ,["4",".",".","8",".","3",".",".","1"]
+                        ,["7",".",".",".","2",".",".",".","6"]
+                        ,[".","6",".",".",".",".","2","8","."]
+                        ,[".",".",".","4","1","9",".",".","5"]
+                        ,[".",".",".",".","8",".",".","7","9"]]
+        Output: true
+        '''
+        row = [[] for _ in range(9)]
+        col = [[] for _ in range(9)]
+        area = [[] for _ in range(9)]
+
+        for i in range(9):
+            for j in range(9):
+                e = board[i][j]
+                if e != '.':
+                    area_id = i // 3 * 3 + j // 3
+                    if e in row[i] or e in col[j] or e in area[area_id]:
+                        return False
+                    else:
+                        row[i].append(e)
+                        col[j].append(e)
+                        area[area_id].append(e)
+
+        return True
+
     def multiply(self, num1, num2):
         '''
         :param num1: str
@@ -1440,21 +1491,6 @@ class LeetCode:
         return str(res)
 
     def permute(self, nums):
-        '''
-        :param nums: List[int]
-        :return: list[List[int]]
-        leetcode medium: 46. Permutations
-        '''
-        L = [[nums[0]]]
-        for n in nums[1:]:
-            new_L = []
-            for perm in L:
-                for i in range(len(perm) + 1):
-                    new_L.append(perm[:i] + [n] + perm[i:])
-                    L = new_L
-                return L
-
-    def permuteDFS(self, nums):
         '''
         :param nums: List[int]
         :return: list[List[int]]
@@ -1710,45 +1746,26 @@ class LeetCode:
             for i in range(0, m):
                 matrix[i][column] = 0
 
-    def combine1(self, n, k):
+    def combine(self, n, k):
         '''
         :param n: int
         :param k: int
         :return: List[List[int]]
         leetcode medium: 77. Combinations
         '''
-        def dfs(nums, k, index, path, res):  # 4
-            if k == 0:  # 7
-                res.append(path)  # 8
-                return  # backtracking  #9
+        def dfs(nums, item, res):
+            if len(item) == k:
+                res.append(item)
+                return
 
-            for i in range(index, len(nums)):  # 10
-                dfs(nums, k - 1, i + 1, path + [nums[i]], res)  # 11
+            for i in range(len(nums)):
+                n_nums = nums[i + 1:]
+                dfs(n_nums, item + [nums[i]],res)
 
-        res = []  # 1
-
-        dfs(range(1, n + 1), k, 0, [], res)  # 2
-
-        return res  # 3
-
-    def combine2(self, n, k):
-        '''
-        :param n: int
-        :param k: int
-        :return: List[List[int]]
-        leetcode medium: 77. Combinations
-        '''
         res = []
-        def dfs(A):
-            if len(A)==k:
-                return res.append(list(A))
 
-            x = A[-1] +1 if A else 1
-            for i in range(x,n+1):
-                A.append(i)
-                dfs(A)
-                A.pop()
-        dfs([])
+        dfs(list(range(1, n + 1)), [], res)
+
         return res
 
     def subsets(self, nums):
@@ -2944,6 +2961,21 @@ class DP:
             if now > res:
                 res = now
         return res
+
+    def permute(self, nums):
+        '''
+        :param nums: List[int]
+        :return: list[List[int]]
+        leetcode medium: 46. Permutations
+        '''
+        L = [[nums[0]]]
+        for n in nums[1:]:
+            new_L = []
+            for perm in L:
+                for i in range(len(perm) + 1):
+                    new_L.append(perm[:i] + [n] + perm[i:])
+                    L = new_L
+                return L
 
     def maxsubarray3(self,nums):
         '''
