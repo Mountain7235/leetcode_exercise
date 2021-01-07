@@ -1240,15 +1240,21 @@ class LeetCode:
         :rtype: int
         leetcode medium: 3. Longest Substring Without Repeating Characters
         """
-        left, right = 0, 0
-        res = 0
-        chars = dict()
-        for right in range(len(s)):
-            if s[right] in chars:
-                left = max(left, chars[s[right]] + 1)
-            chars[s[right]] = right
-            res = max(res, right - left + 1)
-        return res
+        d = {}
+
+        start = 0
+        maxlen = 0
+
+        for i, v in enumerate(s):
+            if v in d and start <= d[v]:
+                start = d[v] + 1
+
+            else:
+                maxlen = max(maxlen, i - start + 1)
+
+            d[v] = i
+
+        return maxlen
 
     def maxArea_1(self, height):
         '''
@@ -1823,7 +1829,6 @@ class LeetCode:
         :return: List[List[str]]
         leetcode medium: 131. Palindrome Partitioning
         '''
-
         def dfs(currList, k, ans):
             if k == len(s):
                 ans.append(currList)
@@ -1838,6 +1843,49 @@ class LeetCode:
         dfs([], 0, ans)
 
         return ans
+
+    def largestNumber(self, nums):
+        '''
+        :param nums: List[int]
+        :return: str
+        leetcode medium: 179. Largest Number
+        '''
+        def merge_sort(nums):
+            if len(nums) <= 1:
+                return nums
+
+            length = len(nums) // 2
+
+            l = merge_sort(nums[:length])
+            r = merge_sort(nums[length:])
+            return merge(l, r)
+
+        def merge(l, r):
+            result = []
+            i = 0
+            j = 0
+
+            while i < len(l) and j < len(r):
+                if int(str(l[i]) + str(r[j])) > int(str(r[j]) + str(l[i])):
+                    result.append(l[i])
+                    i += 1
+                else:
+                    result.append(r[j])
+                    j += 1
+
+            while i < len(l):
+                result.append(l[i])
+                i += 1
+
+            while j < len(r):
+                result.append(r[j])
+                j += 1
+
+            return result
+
+        new_nums = merge_sort(nums)
+
+        return str(int("".join(map(str, new_nums))))
 
     def rotate(self, nums, k):
         '''
@@ -2975,7 +3023,7 @@ class DP:
                 for i in range(len(perm) + 1):
                     new_L.append(perm[:i] + [n] + perm[i:])
                     L = new_L
-                return L
+        return L
 
     def maxsubarray3(self,nums):
         '''
