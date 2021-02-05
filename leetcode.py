@@ -1,6 +1,7 @@
 import collections
 import sys
 import time
+import traceback
 import bisect
 
 # link list
@@ -778,6 +779,24 @@ class LeetCode:
         for i in range(0,len(a)):
             res[i//c][i%c] = a[i]
         return res
+
+    def findLHS(self, nums):
+        '''
+        :param nums: List[int]
+        :return: int
+        leetcode Easy: 594. Longest Harmonious Subsequence
+        input : [1,3,2,2,5,2,3,7]
+        output: 5 , because = [3,2,2,2,3]
+        '''
+        D = collections.Counter(nums)
+
+        ans = [0]
+
+        for k in list(D):
+            if k + 1 in D:
+                ans.append(D[k] + D[k+1])
+
+        return max(ans)
 
     def canPlaceFlowers(self, flowerbed, n):
         '''
@@ -3506,7 +3525,11 @@ class algorithm:
 
         return sum(is_prime)
 
-    def countPrimes(self, n: int) -> int:
+    def countPrimes(self, n):
+        '''
+        :param n: int
+        :return: int
+        '''
         return self.sieve_algorithm(n)
 
     def bfs(self,graph,start):
@@ -3566,8 +3589,6 @@ class algorithm:
             print(vertex)
 
 if __name__ == '__main__':
-    coins = [2,5,7]
-    amount = 27
-
-
-    print(DP().coinChange(coins,amount))
+    bleonly = sys.argv[1]
+    if bleonly:
+        sys.exit(123)

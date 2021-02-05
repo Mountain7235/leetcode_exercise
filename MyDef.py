@@ -31,6 +31,7 @@ import pytz
 import arrow
 import traceback
 import itertools
+import importlib
 
 # region Set Looger
 '''
@@ -169,27 +170,34 @@ def transferParameter():
 def foundSyspath():
     return sys.path[0]
 
-def removeDuplicates(nums) -> int:
-        if len(nums) <= 1:
-            return len(nums)
+def removeDuplicates(nums):
+    '''
+    :param nums: list[int]
+    :return: int
+    '''
+    if len(nums) <= 1:
+        return len(nums)
+    s = 0
+    for f in range(1, len(nums)):
+        if nums[s] != nums[f]:
+            s += 1
+            nums[s] = nums[f]
+    return s + 1
 
-        s = 0
-
-        for f in range(1, len(nums)):
-            if nums[s] != nums[f]:
-                s += 1
-                nums[s] = nums[f]
-        return s + 1
-
-def removeElement(nums, val: int) -> int:
+def removeElement(nums, val):
+    '''
+    :param nums: list[int]
+    :param val: int
+    :return: int
+    '''
     count = 0
     for num in nums:
         if num != val:
-            count+=1
+            count += 1
     return count
 
-def folder_compare(path_a,path_b,out_diff=None,out_a=None,out_b=None,):
-    alist , blist = [],[]
+def folder_compare(path_a, path_b, out_diff=None, out_a=None, out_b=None, ):
+    alist, blist = [], []
     for root, dirs, files in os.walk(path_a):
         alist.extend(files)
 
@@ -203,7 +211,6 @@ def folder_compare(path_a,path_b,out_diff=None,out_a=None,out_b=None,):
 
     for i in sa.difference(sb):
         diff.append(i)
-
 
     for i in sb.difference(sa):
         diff.append(i)
@@ -277,16 +284,6 @@ def LogSample():
     logger.warning("warn message")
     logger.error("error message")
     logger.critical("critical message")
-
-def MakeList(num):
-    return list(range(num))
-
-def HciReset(comNumStr):
-    com = serial.Serial(comNumStr, 115200, timeout=8, parity=serial.PARITY_NONE)
-    com.write(b'\x01\x03\x0C\x00')
-    rev = com.read(7)
-    print(rev.hex().upper())
-    com.close()
 
 def isVampire(x,y):
     multiply = str(x*y)
@@ -374,6 +371,37 @@ def matrix_reverse(matrix):
 
     return a # or return b
 
+def matrix_rotate90(matrix):
+    '''
+    matrix = [[ 1, 2, 3, 4, 5],
+              [ 6, 7, 8, 9,10],
+              [11,12,13,14,15],
+              [16,17,18,19,20],
+              [21,22,23,24,25]]
+
+    matrix = [[1,2,3],
+              [4,5,6],
+              [7,9,8]]
+    '''
+    length = len(matrix)
+    for x in range(len(matrix) // 2):
+        for y in range(x, length - x - 1):
+            temp = matrix[x][y]
+
+            # move values from right to top
+            matrix[x][y] = matrix[y][length - 1 - x]
+
+            # move values from bottom to right
+            matrix[y][length - 1 - x] = matrix[length - 1 - x][length - 1 - y]
+
+            # move values from left to bottom
+            matrix[length - 1 - x][length - 1 - y] = matrix[length - 1 - y][x]
+
+            # assign temp to left
+            matrix[length - 1 - y][x] = temp
+
+    return matrix
+
 def generateSquare(n):
         # 2-D array with all
         # slots set to 0
@@ -436,11 +464,11 @@ def creat_new_excel():
     ws.title = 'mySheet'
     wb.save('test.xlsx')
 
-def cityTime(city_name):
-    if type(city_name) != str:
+def cityTime(city):
+    if type(city) != str:
         return 'input type not string'
 
-    city = city_name.title()
+    city = city.title()
 
     city_timezone = None
 
@@ -450,9 +478,19 @@ def cityTime(city_name):
                 city_timezone = pytz.timezone(tz)
 
     if not city_timezone:
-        return 'The {0} timezone not found ...'.format(city)
+        return 'The {0} timezone not found ...'
 
     return datetime.datetime.now(city_timezone)
+
+def dynamic_load_lib(libpath):
+    if not os.path.exists(libpath):
+        return f'{libpath} not exist , please make sure the lib path'
+
+    path_spilt = os.path.splitext(libpath)[0].split('\\')
+
+    os.chdir('\\'.join(path_spilt[:-1]))
+
+    return importlib.import_module(path_spilt[-1])
 
 def files_collections(pathA=None,pathB=None,diff=None):
     A_path , B_path = [] , []
@@ -476,19 +514,25 @@ def files_collections(pathA=None,pathB=None,diff=None):
                 if Bfiles not in A_path:
                     print(Bfiles)
 
-def error_message():
+def error_messages_display():
     cl, exc, tb = sys.exc_info()
     for lastCallStack in traceback.extract_tb(tb):
-        errMessage = ''.join(['\n######################## Error Message #############################\n'
-                              '    Error class        : {}\n'.format(cl),
-                              '    Error info         : {}\n'.format(exc),
-                              '    Error fileName     : {}\n'.format(lastCallStack[0]),
-                              '    Error fileLine     : {}\n'.format(lastCallStack[1]),
-                              '    Error fileFunction : {}'.format(lastCallStack[2])])
+        errMessage = (f'\n######################## Error Message #############################\n'
+                      f'    Error class        : {cl}\n'
+                      f'    Error info         : {exc}\n'
+                      f'    Error fileName     : {lastCallStack[0]}\n'
+                      f'    Error fileLine     : {lastCallStack[1]}\n'
+                      f'    Error fileFunction : {lastCallStack[2]}')
         print(errMessage)
 # endregion
 
 # region Class group
+class TreeNode:
+    def __init__(self, val=0, left=None, right=None):
+        self.val = val
+        self.left = left
+        self.right = right
+
 class testClassOverride:
     def __init__(self,name,data):
         self._name = name
@@ -512,9 +556,9 @@ class overridetest(testClassOverride):
         return x*y
 
 class ListNode:
-    def __init__(self, data):
-      self.val = data
-      self.next = None
+    def __init__(self, val=0, next=None):
+        self.val = val
+        self.next = next
 
 class SingleLinkedList:
     def __init__(self):
@@ -603,6 +647,11 @@ class magic_square:
         is_repeat_right = len(set(matrix[i][j] for i in range(3) for j in range(3))) == 9  # i and j mean is want n*n sub matrix range(n)
         return is_number_right and is_row_right and is_col_right and is_diagonal_right and is_repeat_right
 
+class ttest:
+
+    def total(self,a,b):
+        return a+b
+
 def reverseList(head):
     prev = None
 
@@ -615,337 +664,9 @@ def reverseList(head):
 
 # endregion
 
-def insert(intervals, newInterval):
-    '''
-    :param intervals: List[List[int]]
-    :param newInterval: List[int]
-    :return: List[List[int]]
-    '''
-    import bisect
-    if not intervals: return [newInterval]
-
-    n = len(intervals)
-    start_list = [x[0] for x in intervals]
-    end_list = [x[1] for x in intervals]
-    start = newInterval[0]
-    end = newInterval[1]
-
-    i = bisect.bisect_left(end_list,start)
-    if i == n or end < intervals[i][0]:
-        return intervals[:i] + [[start,end]] + intervals[i:]
-
-    start = min(start,intervals[i][0])
-    end = max(end,intervals[i][1])
-
-    j = i + bisect.bisect_right(start_list[i:],end)
-    end = max(end,intervals[j-1][1])
-
-    return intervals[:i] + [[start,end]] + intervals[j:]
-
-def isPossibleDivide(nums, k):
-    '''
-    :param nums: List[int]
-    :param k: int
-    :return: bool
-    '''
-    if len(nums) % k != 0:
-        return False
-
-    cnt = collections.Counter(nums)
-
-    nums.sort()
-
-    for n in nums:
-        t = cnt[n]
-
-        if t:
-            for i in range(n, n + k):
-                if cnt[i] < t:
-                    return False
-                cnt[i] -= t
-
-    return True
-# region Tample
-
-class TreeNode:
-    def __init__(self, val=0, left=None, right=None):
-        self.val = val
-        self.left = left
-        self.right = right
-
-def divide(dividend, divisor):
-    '''
-    :param dividend: int
-    :param divisor: int
-    :return: int
-    '''
-    flag = (dividend < 0) ^ (divisor < 0)
-    dividend, divisor = abs(dividend), abs(divisor)
-    ans = 0
-    while divisor <= dividend:
-        temp = 1
-        div = divisor
-        while (div << 1) <= dividend:
-            div <<= 1
-            temp <<= 1
-        dividend -= div
-        ans += temp
-        if ans >= 0x7fffffff:
-            if flag and ans == 0x80000000:
-                return -0x80000000
-            return 0x7fffffff
-    return ans if not flag else -ans
-
-def matrixReshape(nums, r, c):
-    '''
-    :param nums: List[List[int]]
-    :param r: int
-    :param c: int
-    :return: List[List[int]]
-    '''
-    a = sum(nums, [])
-    if (len(a) != (r * c)):
-        return nums
-    res = [[0] * c for _ in range(r)]
-    for i in range(0, len(a)):
-        res[i // c][i % c] = a[i]
-    return res
-
-def coinChange(coins, amount):
-    '''
-    coins = [2,5,7] , amount = 27
-    :param coins: list[int]
-    :param amount: int
-    :return:
-    '''
-    rs = [float('inf')] * (amount+1)
-    rs[0] = 0
-    for i in range(1, amount+1):
-        for c in coins:
-            if i >= c:
-                rs[i] = min(rs[i], rs[i-c] + 1)
-
-    if rs[amount] == float('inf'):
-        return -1
-
-    return rs[amount]
-
-def longestArithSeqLength(A):
-    '''
-    :param A: List[int]
-    :return:  int
-    '''
-    n = len(A)
-    if n == 0:
-        return 0
-
-    res = 0
-
-    tmp = [{} for i in range(n)]
-
-    for i in range(n):
-        for j in range(0, i):
-            diff = A[i] - A[j]
-
-            if diff in tmp[j]:
-                tmp[i][diff] = tmp[j][diff] + 1
-
-            else:
-                tmp[i][diff] = 2
-
-            res = max(res, tmp[i][diff])
-
-    return res
-
-class Solution:
-    def __init__(self):
-        pass
-
-    def rangeSumBST(self, root, L, R):
-        '''
-        :param root: TreeNode
-        :param L: int
-        :param R: int
-        :return: int
-        '''
-        self.total = 0
-
-        def dfs(node, L, R):
-            if not node:
-                return 0
-
-            if L <= node.val <= R:
-                print(node.val)
-                self.total += node.val
-
-            dfs(node.left, L, R)
-
-            dfs(node.right, L, R)
-
-        dfs(root, L, R)
-
-        return self.total
-
-def buddyStrings(A, B):
-    '''
-    :param A: str
-    :param B: str
-    :return: bool
-    '''
-    if not A or len(A) != len(B):
-        return False
-
-    diff = []
-
-    A = list(A)
-
-    B = list(B)
-
-    for i in range(len(A)):
-        if A[i] != B[i]:
-            diff.append(i)
-
-    if len(diff) > 2:
-        return False
-
-    A[diff[0]], A[diff[1]] = A[diff[1]], A[diff[0]]
-
-    print(A)
-    print(B)
-
-    if A != B:
-        return False
-
-    return True
-
-# endregion
-
-def findUnsortedSubarray(nums):
-    '''
-    :param nums: List[int]
-    :return: int
-    '''
-    si = ei = 0
-    ls = len(nums)
-
-    # Find Start Index
-    for i in range(ls - 1):
-        if nums[i] > nums[i + 1]:
-            si = i
-            break
-
-    # Find End Index
-    for i in range(ls - 1, 0, -1):
-        if nums[i] < nums[i - 1]:
-            ei = i
-            break
-
-    '''Check if si is really si or not [1,3,4,{2,8,9,12,9}, 11] : 
-       si points to 2 which is not right'''
-
-    min_val = min(nums[si:ei + 1])
-
-    for i in range(si):
-        if nums[i] > min_val:
-            si = i
-            break
-
-    '''If we sort {2<->9} still it's not answer is not correct as 12 is greater than 11 so we 
-       need to find orginal End index'''
-    max_val = max(nums[si:ei + 1])
-    for i in range(ls - 1, si, -1):
-        if nums[i] < max_val:
-            ei = i
-            break
-
-    return (ei - si + 1) if ei - si > 0 else 0
-
-def can_segment_string(s, dictionary):
-    for i in range(len(s) - 1):
-        print(s[0:i+1],s[i+1:])
-
-        if s[0:i+1] in dictionary and s[i:] in dictionary:
-            return True
-
-    return False
-
 if __name__ == '__main__':
     try:
-        # t1 = TreeNode(1,TreeNode(3,left=TreeNode(5)),TreeNode(2))
-        # t2 = TreeNode(2, TreeNode(1, right=TreeNode(5)), TreeNode(3, right=TreeNode(7)))
-        '''
-        flowerbed = [1, 0, 0, 0, 1]
-        n = 1
+        f = [1,2,3,4]
         
-        ans, start, left = 0, -1, -2
-        flowerbed += [0, 1]
-
-        for i in (flowerbed):
-            start += 1
-            if i == 1:
-                ans += (start - left - 2) // 2
-                left = start
-                if ans >= n:
-                    print( True)
-
-        print(False)
-        '''
-        '''
-        mat =[[1, 1, 0, 0, 0],
-              [1, 1, 1, 1, 0],
-              [1, 0, 0, 0, 0],
-              [1, 1, 0, 0, 0],
-              [1, 1, 1, 1, 1]]
-        k = 3
-
-
-        d = {i:sum(mat[i]) for i in range(len(mat))}
-
-        print([i[0] for i in sorted(d.items(),key=lambda item:item[1])[:k]])
-        '''
-        '''
-        matrix = [[4,3,8,4],
-                  [9,5,1,9],
-                  [2,7,6,2]]
-        '''
-
-        '''
-        flowerbed = [1, 0, 0, 0, 1]
-        n = 1
-
-        l = [0] + flowerbed + [0]
-
-        for i in range(1, len(l) - 1):
-            print(l[i - 1:i + 2])
-            if sum(l[i - 1:i + 2]) == 0:
-                l[i] = 1
-                n -= 1
-        '''
-
-        n = 257761
-
-        m = list(str(n))  ## n = 257761
-        l = len(m)  ## l = 6
-        d = {}
-        res = str(n)
-        for i, c in enumerate(m[::-1]):
-            if not d:
-                d[c] = 1
-            else:
-                if all(c >= x for x in d):
-                    d[c] = d.get(c, 0) + 1
-                else:
-                    d[c] = d.get(c, 0) + 1
-                    res = ''.join(m[:l - 1 - i])
-                    stock = sorted(list(d.keys()))
-                    cplus = stock[stock.index(c) + 1]
-                    res += cplus
-                    d[cplus] -= 1
-                    res += ''.join([x * d[x] for x in stock])
-
-                    break
-
-        print(int(res)) if n < int(res) < (2 ** 31 - 1) else -1
-
     except:
-        error_message()
+        error_messages_display()
