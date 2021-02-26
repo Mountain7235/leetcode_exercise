@@ -1275,69 +1275,30 @@ class LeetCode:
 
         return maxlen
 
-    def maxArea_1(self, height):
-        '''
-        :param height: List[int]
-        :return: int
-        leetcode medium: 11. Container With Most Water
-        '''
-        ans = 0
-        l = 0
-        r = len(height) - 1
-
-        while l < r:
-            ans = max(ans, min(height[l], height[r]) * (r - l))
-
-            if height[l] < height[r]:
-                l += 1
-            else:
-                r -= 1
-
-        return ans
-
-    def maxArea_2(self, height):
+    def maxArea(self, height):
         '''
         :param height: List[int]
         :return: int
         leetcode medium: 11. Container With Most Water
         '''
         maxArea = 0
-        left = 0
-        right = len(height)-1
+        left    = 0
+        right   = len(height)-1
 
         while left != right:
             width = right - left
+
             if height[left] <= height[right]:
-                area = width*height[left]
+                area = width * height[left]
                 left += 1
+
             else:
-                area = width*height[right]
+                area = width * height[right]
                 right -= 1
 
             if area > maxArea:
                 maxArea = area
 
-        return maxArea
-
-    def maxArea_3(self, height):
-        '''
-        :param height: List[int]
-        :return: int
-        leetcode medium: 11. Container With Most Water
-        '''
-        maxArea = 0
-        left = 0
-        right = len(height)-1
-        while left!= right:
-            width=right-left
-            if height[left] <= height[right]:
-                area = width*height[left]
-                left += 1
-            else:
-                area = width*height[right]
-                right -= 1
-            if area>maxArea:
-                maxArea = area
         return maxArea
 
     def threeSum(self,nums):
@@ -1494,6 +1455,32 @@ class LeetCode:
 
         return True
 
+    def combinationSum(self, candidates, target):
+        '''
+        :param candidates: List[int]
+        :param target:     int
+        :return:           List[List[int]]
+        leetcode medium: 39. Combination Sum
+        '''
+        candidates.sort()
+
+        res, length = [], len(candidates)
+
+        def dfs(target, start, vlist):
+            if target == 0:
+                return res.append(vlist)
+
+            for i in range(start, length):
+                if target < candidates[i]:
+                    break
+
+                else:
+                    dfs(target - candidates[i], i, vlist + [candidates[i]])
+
+        dfs(target, 0, [])
+
+        return res
+
     def multiply(self, num1, num2):
         '''
         :param num1: str
@@ -1520,16 +1507,20 @@ class LeetCode:
         :param nums: List[int]
         :return: list[List[int]]
         leetcode medium: 46. Permutations
+        Input: nums = [1,2,3]
+        Output: [[1,2,3],[1,3,2],[2,1,3],[2,3,1],[3,1,2],[3,2,1]]
         '''
-        def dfs(nums, item, res):
-            if not nums:
+        def dfs(number, item, res):
+            if len(item) == len(nums):
                 res.append(item)
+                return
 
-            for i in range(len(nums)):
-                num_remain = nums[:i] + nums[i + 1:]
-                dfs(num_remain, item + [nums[i]], res)
+            for i in range(len(number)):
+                n_nums = number[:i] + number[i + 1:]
+                dfs(n_nums, item + [number[i]], res)
 
         res = []
+
         dfs(nums, [], res)
 
         return res
@@ -1777,15 +1768,23 @@ class LeetCode:
         :param k: int
         :return: List[List[int]]
         leetcode medium: 77. Combinations
+        Input: n = 4, k = 2
+        Output:
+        [ [2,4],
+          [3,4],
+          [2,3],
+          [1,2],
+          [1,3],
+          [1,4]]
         '''
-        def dfs(nums, item, res):
+        def dfs(number, item, res):
             if len(item) == k:
                 res.append(item)
                 return
 
-            for i in range(len(nums)):
-                n_nums = nums[i + 1:]
-                dfs(n_nums, item + [nums[i]],res)
+            for i in range(len(number)):
+                n_nums = number[i + 1:]
+                dfs(n_nums, item + [number[i]], res)
 
         res = []
 
@@ -1801,22 +1800,22 @@ class LeetCode:
         :output : [[],[1],[1,2],[1,2,2],[2],[2,2]]
         leetcode medium: 78. Subsets
         """
-        res = []
         if not nums:
-            return res
+            return []
 
         nums = sorted(nums)
 
-        def dfs_help(index, item, res):
+        def dfs(index, item, res):
             res.append(item)
+
             for i in range(index, len(nums)):
-                # skip the same neibor
                 if i > index and nums[i] == nums[i - 1]:
                     continue
 
-                dfs_help(i + 1, item + [nums[i]], res)
+                dfs(i + 1, item + [nums[i]], res)
 
-        dfs_help(0, [], res)
+        res = []
+        dfs(0, [], res)
 
         return res
 
@@ -1847,21 +1846,24 @@ class LeetCode:
         :param s: str
         :return: List[List[str]]
         leetcode medium: 131. Palindrome Partitioning
+        Input: s = "aab"
+        Output: [["a","a","b"],["aa","b"]]
         '''
-        def dfs(currList, k, ans):
-            if k == len(s):
-                ans.append(currList)
+        def dfs(index,item,res):
+            if index == len(s):
+                res.append(item)
                 return
 
-            for i in range(k, len(s)):
-                tmpStr = s[k:i + 1]
+            for i in range(index, len(s)):
+                tmpStr = s[index:i + 1]
                 if tmpStr == tmpStr[::-1]:
-                    dfs(currList + [tmpStr], i + 1, ans)
+                    dfs(i + 1,item + [tmpStr], res)
 
-        ans = []
-        dfs([], 0, ans)
+        res = []
 
-        return ans
+        dfs(0,[],res)
+
+        return res
 
     def largestNumber(self, nums):
         '''
@@ -2465,6 +2467,30 @@ class LeetCode:
 
         return n + 3 - n % 2
 
+    def letterCasePermutation(self, S):
+        '''
+        :param S: str
+        :return: List[str]
+        leetcode medium: 784. Letter Case Permutation
+        Input: S = "a1b2"
+        Output: ["a1b2","a1B2","A1b2","A1B2"]
+        '''
+        def dfs(index, item, ans):
+            if index == len(S):
+                ans.append(item)
+                return
+
+            if S[index].isalpha():
+                dfs(index + 1, item + S[index].lower(), ans)
+
+            dfs(index + 1, item + S[index].upper(), ans)
+
+        ans = []
+
+        dfs(0, "", ans)
+
+        return ans
+
     def numMagicSquaresInside(self, grid):
         '''
         :param grid:List[List[int]]
@@ -2546,6 +2572,50 @@ class LeetCode:
             if K == 0 and S[i - 1].isalpha():
                 return S[i - 1]
 
+    def brokenCalc(self, X, Y):
+        '''
+        :param X: int
+        :param Y: int
+        :return: int
+        leetcode medium: 991. Broken Calculator
+        Input: X = 2, Y = 3
+        Output: 2
+        Explanation: Use double operation and then decrement operation {2 -> 4 -> 3}.
+        '''
+        '''
+        recursive :
+        def brokenCalc(self, X: int, Y: int) -> int:
+            if X >= Y:
+                return X - Y
+            if Y % 2 == 0:
+                return 1 + self.brokenCalc(X, Y // 2)
+            if Y % 2 == 1:
+                return 2 + self.brokenCalc(X, (Y + 1) // 2)            
+        
+        Bit manipulation, O(log log n)
+        def brokenCalc(self, X: int, Y: int) -> int:
+            count = 0
+            while Y > X:
+                if Y&1:
+                    Y += 1
+                    count += 1
+                Y >>= 1
+                count += 1
+                
+            return count + X-Y     
+        '''
+
+        count = 0
+        while X < Y:
+            count += 1
+
+            if Y % 2:
+                Y += 1
+            else:
+                Y //= 2
+
+        return X - Y + count
+
     def minDominoRotations(self, A, B):
         '''
         :param A: List[int]
@@ -2594,28 +2664,7 @@ class LeetCode:
             if remainder == 0:
                 return N
 
-    def goodNodes1(self, root):
-        '''
-        :param root: : TreeNode
-        :return: int
-        1448. Count Good Nodes in Binary Tree
-        '''
-        self.res = 0
-
-        def goodguys(root, val):
-            if not root:
-                return
-            if root.val >= val:
-                self.res += 1
-                val = root.val
-            goodguys(root.left, val)
-            goodguys(root.right, val)
-
-
-        goodguys(root, float("-inf"))
-        return self.res
-
-    def goodNodes2(self, root):
+    def goodNodes(self, root):
         '''
         :param root: : TreeNode
         :return: int
@@ -2623,14 +2672,19 @@ class LeetCode:
         '''
         count = 0
         stack = [(root.val, root)]
+
         while stack:
             max_value, node = stack.pop()
+
             if node.val >= max_value:
                 count += 1
+
             if node.right:
                 stack.append((max(node.right.val, max_value), node.right))
+
             if node.left:
                 stack.append((max(node.left.val, max_value), node.left))
+
         return count
 
     def smallestDivisor(self, nums, threshold):
@@ -2906,7 +2960,7 @@ class DP:
             if nums[index] == target or nums[index] > target:
                 return index
 
-    def combinationSum_DP1(self, candidates, target):
+    def combinationSum(self, candidates, target):
         '''
         :param candidates: List[int]
         :param target:     int
@@ -2923,81 +2977,6 @@ class DP:
                 dp[i] += [sublist + [candidate] for sublist in dp[i - candidate]]
 
         return dp[target]
-
-    def combinationSum_DP2(self, candidates, target):
-        '''
-        :param candidates: List[int]
-        :param target:     int
-        :return:           List[List[int]]
-        leetcode medium: 39. Combination Sum
-        '''
-        if target < min(candidates):
-            return None
-
-        answer = []
-
-        universe = [([], 0)]
-
-        for n in candidates:
-            for (ls, v) in universe:
-                if v + n == target:
-                    answer.append(ls + [n])
-                elif v + n < target:
-                    universe.append((ls + [n], v + n))
-
-        return answer
-
-    def combinationSum_DFS(self, candidates, target):
-        '''
-        :param candidates: List[int]
-        :param target:     int
-        :return:           List[List[int]]
-        leetcode medium: 39. Combination Sum
-        '''
-
-        #下面有一個目標值小於某一元素就break，所以先排序
-        candidates.sort()
-        #儲存返回的二維列表
-        res, length = [], len(candidates)
-
-        #遞歸，目標值，起始位置，當前組合
-        def dfs(target, start, vlist):
-            #目標值爲0，表明當前遞歸完成，把當前遞歸結果加入res並返回
-            if target == 0:
-                return res.append(vlist)
-            #從開始下標循環
-            for i in range(start, length):
-                #candidates有序，只要當前大於目標後面都大於，直接break
-                if target < candidates[i]:
-                    break
-                #否則目標值減當前值，i爲新的起始位置，把當前值加入當前組合
-                else:
-                    dfs(target - candidates[i], i, vlist + [candidates[i]])
-
-        dfs(target, 0, [])
-
-        return res
-
-    def combinationSum_dfs(self, candidates, target):
-        '''
-        :param candidates: List[int]
-        :param target:     int
-        :return:           List[List[int]]
-        leetcode medium: 39. Combination Sum
-        '''
-        def dfs(nums, target, index, path, res):
-            if target < 0:
-                return  # backtracking
-            if target == 0:
-                res.append(path)
-                return
-            for i in range(index, len(nums)):
-                dfs(nums, target - nums[i], i, path + [nums[i]], res)
-
-        res = []
-        candidates.sort()
-        dfs(candidates, target, 0, [], res)
-        return res
 
     def maxsunarry1(self,nums):
         '''
@@ -3425,6 +3404,23 @@ class DP:
 
         return s[start: end + 1]
 
+    def numberOfArithmeticSlices(self, A):
+        '''
+        :param A: List[int]
+        :return: int
+        leetcode medium: 413. Arithmetic Slices
+        input: A = [1, 2, 3, 4]
+        output: return: 3,
+        for 3 arithmetic slices in A: [1, 2, 3], [2, 3, 4] and [1, 2, 3, 4] itself.
+        '''
+        dp = [0] * len(A)
+
+        for i in range(2, len(A)):
+            if A[i] - A[i - 1] == A[i - 1] - A[i - 2]:
+                dp[i] = dp[i - 1] + 1
+
+        return sum(dp)
+
     def findMaxForm(self, strs, m, n):
         '''
         :param strs: List[str]
@@ -3440,6 +3436,45 @@ class DP:
                 for j in range(n, ones - 1, -1):
                     dp[i][j] = max(1 + dp[i - zeros][j - ones], dp[i][j])
         return dp[-1][-1]
+
+    def findTargetSumWays(self,nums, S):
+        '''
+        :param nums: : List[int]
+        :param S: int
+        :return: int
+        leetcode medium: 494. Target Sum
+        '''
+        '''
+        D = collections.defaultdict(int)
+
+        D[nums[0]] += 1
+        D[-nums[0]] += 1
+
+        for num in nums[1:]:
+            D_tmp = collections.defaultdict(int)
+
+            for k in D.keys():
+                D_tmp[k + num] += D[k]
+                D_tmp[k - num] += D[k]
+
+            D = D_tmp
+
+        return D[S]
+        '''
+
+        dp = collections.Counter()
+        dp[0] = 1
+
+        for n in nums:
+            ndp = collections.Counter()
+
+            for sgn in (1, -1):
+                for k in dp.keys():
+                    ndp[k + n * sgn] += dp[k]
+
+            dp = ndp
+
+        return dp[S]
 
     def fib(self,N):
         '''
@@ -3499,6 +3534,261 @@ class DP:
             g[i] = min(f[i - 1] * nums[i], nums[i], g[i - 1] * nums[i])
             res = max(res, f[i])
         return res
+
+class DFS:
+    def generateParenthesis(self, n):
+        '''
+        :param n: int
+        :return: List[str]
+        leetcode medium: 22. Generate Parentheses
+        '''
+        allOutput = set([])
+
+        def dfs(output, numOfLeft, numOfRight, n):
+            if len(output) == n * 2:
+                allOutput.add(output)
+                return
+
+            if numOfLeft < n:
+                dfs(output + '(', numOfLeft + 1, numOfRight, n)
+
+            if numOfLeft > numOfRight and numOfRight < n:
+                dfs(output + ')', numOfLeft, numOfRight + 1, n)
+
+        dfs('(', 1, 0, n)
+        return allOutput
+
+    def combinationSum(self, candidates, target):
+        '''
+        :param candidates: List[int]
+        :param target:     int
+        :return:           List[List[int]]
+        leetcode medium: 39. Combination Sum
+        '''
+        candidates.sort()
+
+        res, length = [], len(candidates)
+
+        def dfs(target, start, vlist):
+            if target == 0:
+                return res.append(vlist)
+
+            for i in range(start, length):
+                if target < candidates[i]:
+                    break
+
+                else:
+                    dfs(target - candidates[i], i, vlist + [candidates[i]])
+
+        dfs(target, 0, [])
+
+        return res
+
+    def permute(self, nums):
+        '''
+        :param nums: List[int]
+        :return: list[List[int]]
+        leetcode medium: 46. Permutations
+        Input: nums = [1,2,3]
+        Output: [[1,2,3],[1,3,2],[2,1,3],[2,3,1],[3,1,2],[3,2,1]]
+        '''
+        def dfs(number, item, res):
+            if len(item) == len(nums):
+                res.append(item)
+                return
+
+            for i in range(len(number)):
+                n_nums = number[:i] + number[i + 1:]
+                dfs(n_nums, item + [number[i]], res)
+
+        res = []
+
+        dfs(nums, [], res)
+
+        return res
+
+    def combine(self, n, k):
+        '''
+        :param n: int
+        :param k: int
+        :return: List[List[int]]
+        leetcode medium: 77. Combinations
+        Input: n = 4, k = 2
+        Output:
+        [ [2,4],
+          [3,4],
+          [2,3],
+          [1,2],
+          [1,3],
+          [1,4]]
+        '''
+        def dfs(number, item, res):
+            if len(item) == k:
+                res.append(item)
+                return
+
+            for i in range(len(number)):
+                n_nums = number[i + 1:]
+                dfs(n_nums, item + [number[i]], res)
+
+        res = []
+
+        dfs(list(range(1, n + 1)), [], res)
+
+        return res
+
+    def subsets(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: List[List[int]]
+        :input: [1,2,2]
+        :output : [[],[1],[1,2],[1,2,2],[2],[2,2]]
+        leetcode medium: 78. Subsets
+        """
+        if not nums:
+            return []
+
+        nums = sorted(nums)
+
+        def dfs(index, item, res):
+            res.append(item)
+
+            for i in range(index, len(nums)):
+                if i > index and nums[i] == nums[i - 1]:
+                    continue
+
+                dfs(i + 1, item + [nums[i]], res)
+
+        res = []
+        dfs(0, [], res)
+
+        return res
+
+    def partition(self, s):
+        '''
+        :param s: str
+        :return: List[List[str]]
+        leetcode medium: 131. Palindrome Partitioning
+        Input: s = "aab"
+        Output: [["a","a","b"],["aa","b"]]
+        '''
+        def dfs(index,item,res):
+            if index == len(s):
+                res.append(item)
+                return
+
+            for i in range(index, len(s)):
+                tmpStr = s[index:i + 1]
+                if tmpStr == tmpStr[::-1]:
+                    dfs(i + 1,item + [tmpStr], res)
+
+        res = []
+
+        dfs(0,[],res)
+
+        return res
+
+    def numIslands(self, grid):
+        '''
+        :param grid: List[List[str]]
+        :return: int
+        leetcode medium: 200. Number of Islands
+                grid = [['1','1','1','1','0'],
+                ['1','1','0','1','0'],
+                ['1','1','0','0','0'],
+                ['0','0','0','0','0']]
+        '''
+        def dfs(grid, i, j):
+            grid[i][j] = '0'
+
+            checks = [[0, -1], [0, 1], [-1, 0], [1, 0]]
+
+            for check in checks:
+                nr = i + check[0]
+                nc = j + check[1]
+
+                if 0 <= nr < len(grid) and 0 <= nc < len(grid[0]):
+                    if grid[nr][nc] == '1':
+                        dfs(grid, nr, nc)
+
+        cnt = 0
+
+        for r in range(len(grid)):
+            for c in range(len(grid[0])):
+                if grid[r][c] == '1':
+                    cnt += 1
+                    dfs(grid, r, c)
+
+        return cnt
+
+    def letterCasePermutation(self, S):
+        '''
+        :param S: str
+        :return: List[str]
+        leetcode medium: 784. Letter Case Permutation
+        Input: S = "a1b2"
+        Output: ["a1b2","a1B2","A1b2","A1B2"]
+        '''
+        def dfs(index, item, ans):
+            if index == len(S):
+                ans.append(item)
+                return
+
+            if S[index].isalpha():
+                dfs(index + 1, item + S[index].lower(), ans)
+
+            dfs(index + 1, item + S[index].upper(), ans)
+
+        ans = []
+
+        dfs(0, "", ans)
+
+        return ans
+
+    def rangeSumBST(self, root, L, R):
+        '''
+        :param root: TreeNode
+        :param L: int
+        :param R: int
+        :return: int
+        leetcode easy: 938. Range Sum of BST
+        '''
+        self.total = 0
+
+        def dfs(node, L, R):
+            if not node:
+                return 0
+
+            if L <= node.val <= R:
+                self.total += node.val
+
+            dfs(node.left, L, R)
+
+            dfs(node.right, L, R)
+
+        dfs(root, L, R)
+
+        return self.total
+
+    def goodNodes(self, root):
+        '''
+        :param root: : TreeNode
+        :return: int
+        1448. Count Good Nodes in Binary Tree
+        '''
+        self.res = 0
+
+        def goodguys(root, val):
+            if not root:
+                return
+            if root.val >= val:
+                self.res += 1
+                val = root.val
+            goodguys(root.left, val)
+            goodguys(root.right, val)
+
+        goodguys(root, float("-inf"))
+        return self.res
 
 class algorithm:
     def sieve_algorithm(self, n):
