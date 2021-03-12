@@ -814,6 +814,32 @@ class LeetCode:
 
         return n <= 0
 
+    def findErrorNums(self, nums):
+        '''
+        :param nums: List[int]
+        :return: List[int]
+        leetcode Easy: 645. Set Mismatch
+        Input: nums = [1,2,2,4]
+        Output: [2,3]
+        Output first number is repetition of one number of output
+        Output second number is loss of another number of output
+        '''
+        seen = [0] * (len(nums) + 1)
+        seen[0] = 1
+
+        duplicated = 0
+        for n in nums:
+            if seen[n]:
+                duplicated = n
+            seen[n] = 1
+
+        missing = 0
+        for idx, n in enumerate(seen):
+            if n == 0:
+                missing = idx
+
+        return [duplicated, missing]
+
     def isToeplitzMatrix(self, matrix):
         """
         :type matrix: List[List[int]]
