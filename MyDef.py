@@ -32,6 +32,9 @@ import arrow
 import traceback
 import itertools
 import importlib
+from leetcode import LeetCode_Easy as easy
+from leetcode import LeetCode_Medium as medium
+
 
 # region Set Looger
 '''
@@ -43,6 +46,140 @@ formatter = logging.Formatter("[%(name)s][%(levelname)s]%(message)s")
 DisplayHandle.setFormatter(formatter)
 logger.addHandler(DisplayHandle)
 '''
+# endregion
+
+# region Class group
+class TreeNode:
+    def __init__(self, val=0, left=None, right=None):
+        self.val = val
+        self.left = left
+        self.right = right
+
+class testClassOverride:
+    def __init__(self,name,data):
+        self._name = name
+        self.data = data
+
+    def kk(self,x,y):
+        return x+y
+    @property
+    def name(self):
+        return self._name
+
+    # getattr(testClassOverride('aaa',123),'kk')(2,4) >>> 6
+    # if hasattr(testClassOverride,'kk'): >>> True
+
+class overridetest(testClassOverride):
+    def __init__(self,name,data):
+        testClassOverride.__init__(self,name,data)
+        # or  -> super().__init__(name,data)
+
+    def kk(self,x,y):
+        return x*y
+
+class ListNode:
+    def __init__(self, val=0, next=None):
+        self.val = val
+        self.next = next
+
+def link_list(nums):
+    '''
+    :param nums: list[int]
+    :return: link list
+    '''
+    head = ListNode(nums[0])
+
+    link = head
+
+    for i in nums[1:]:
+        head.next = ListNode(i)
+        head = head.next
+
+    return link
+
+class magic_square:
+    def sub_square(self, grid):
+        matrix = []
+        '''
+        for x in range(len(grid) - 2):
+            for y in range(len(grid[0]) - 2):
+                sub_matrix = []
+                tempmatrix.append(grid[x][y:y + 3])
+                tempmatrix.append(grid[x + 1][y: y + 3])
+                tempmatrix.append(grid[x + 2][y: y + 3])
+                matrix.append(sub_matrix)
+        '''
+
+        for row in range(len(grid) - 2): # -2 : mean is want n*n sub matrix range(len(grid) - (n-1))
+            for col in range(len(grid[0]) - 2): # -2 : mean is want n*n sub matrix range(len(grid) - (n-1))
+                # i and j mean is want n*n sub matrix range(n)
+                sub_matrix = [[grid[row + i][col + j] for j in range(3)] for i in range(3)]
+                matrix.append(sub_matrix)
+
+        return matrix
+
+    def is_magic_square(self, matrix):
+        '''
+        #----------检查条件1-9
+        digit = 0 for i in range(0, 10)]
+
+        for row in ma:
+            for d in row:
+                if d > 9:
+                    return False
+                digit[d] = 0
+
+        for i in range(1, 10):
+            if digit[i] != 0:
+                return False
+
+        #----检查每一行
+        s = sum(ma[0])
+
+        for i in range(1, 3):
+            if sum(ma[i]) != s:
+                return False
+
+        #---检查对角线
+        sdia = 0
+        for i in range(0, 3):
+            sdia +=ma[i][i]
+        if sdia != s:
+            return False
+
+        sdia -= ma[2][0] + ma[1][1] + ma[0][2]
+        if sdia != 0:
+            return False
+
+        #---检查每一列
+        for j in range(0, 3):
+            sc = 0
+            for i in range(0,3):
+                sc += ma[i][j]
+            if sc != s:
+                return False
+
+        return True
+        '''
+
+        is_number_right = all(1 <= matrix[i][j] <= 9 for i in range(3) for j in range(3)) # i and j mean is want n*n sub matrix range(n)
+        is_row_right = all(sum(row) == 15 for row in matrix) # == 15 mean is magic square sum() = n(n^2+1)/2
+        is_col_right = all(sum(col) == 15 for col in [[matrix[i][j] for i in range(3)] for j in range(3)]) # i and j mean is want n*n sub matrix range(n)
+        is_diagonal_right = matrix[1][1] == 5 and matrix[0][0] + matrix[-1][-1] == 10 and matrix[0][-1] + \
+                            matrix[-1][0] == 10 # 5 is in matrix central and sum corner == 10
+        is_repeat_right = len(set(matrix[i][j] for i in range(3) for j in range(3))) == 9  # i and j mean is want n*n sub matrix range(n)
+        return is_number_right and is_row_right and is_col_right and is_diagonal_right and is_repeat_right
+
+def reverseList(head):
+    prev = None
+
+    while head:
+        current = head
+        head = head.next
+        current.next = prev
+        prev = current
+    return prev
+
 # endregion
 
 # region Base Function
@@ -234,33 +371,32 @@ def folder_compare(path_a, path_b, out_diff=None, out_a=None, out_b=None, ):
 
 def fun():#fun()()()
     print("this is fun")
+
     def _fun():
         print("this is _fun")
+
         def __fun():
             print("this is __fun")
+
         return __fun
+
     return _fun
 
 def decorateApple(f):
     def d_f(*args, **kargs):
         print("apple before call")
+
         result = f(*args, **kargs)
+
         print("apple after call")
+
         return result
+
     return d_f
 
 @decorateApple # ==> hello = decorateApple(print_hello)
 def hello():
     print("hello first time.")
-
-def cleanup_function():
-    print(sys._getframe().f_code.co_name)
-    #program run as below
-    '''
-    print('registering')
-    atexit.register(cleanup_function)
-    print('registered')
-    '''
 
 def LogSample():
     logger = logging.getLogger("simple_example")
@@ -356,20 +492,17 @@ def matrix_print(matrix):
                                                               matrix[i][len(matrix) - 1 - i]))  #left diagonal
 
 def matrix_reverse(matrix):
-    a = [list(i) for i in zip(*matrix)]
-    # or
-    b = [[row[col] for row in matrix]
-          for col in range(len(matrix[0]))]
-    '''
-    b = []
-    for c in range(len(matrix[0])):
-        t = []
-        for r in matrix:
-            t.append(r[c])
-        b.append(t)
-    '''
+    new_matrix = []
 
-    return a # or return b
+    for col in range(len(matrix[0])):
+        cell = []
+
+        for row in matrix:
+            cell.append(row[col])
+
+        new_matrix.append(cell)
+
+    return new_matrix
 
 def matrix_rotate90(matrix):
     '''
@@ -403,59 +536,58 @@ def matrix_rotate90(matrix):
     return matrix
 
 def generateSquare(n):
-        # 2-D array with all
-        # slots set to 0
-        magicSquare = [[0 for x in range(n)]
-                       for y in range(n)]
+    # 2-D array with all
+    # slots set to 0
+    magicSquare = [[0 for x in range(n)]
+                   for y in range(n)]
 
-        # initialize position of 1
-        i = n / 2
-        j = n - 1
+    # initialize position of 1
+    i = n / 2
+    j = n - 1
 
-        # Fill the magic square
-        # by placing values
-        num = 1
-        while num <= (n * n):
-            if i == -1 and j == n:  # 3rd condition
-                j = n - 2
-                i = 0
-            else:
+    # Fill the magic square
+    # by placing values
+    num = 1
+    while num <= (n * n):
+        if i == -1 and j == n:  # 3rd condition
+            j = n - 2
+            i = 0
+        else:
+            # next number goes out of
+            # right side of square
+            if j == n:
+                j = 0
 
-                # next number goes out of
-                # right side of square
-                if j == n:
-                    j = 0
+            # next number goes
+            # out of upper side
+            if i < 0:
+                i = n - 1
 
-                # next number goes
-                # out of upper side
-                if i < 0:
-                    i = n - 1
+        if magicSquare[int(i)][int(j)]:  # 2nd condition
+            j = j - 2
+            i = i + 1
+            continue
 
-            if magicSquare[int(i)][int(j)]:  # 2nd condition
-                j = j - 2
-                i = i + 1
-                continue
-            else:
-                magicSquare[int(i)][int(j)] = num
-                num = num + 1
+        else:
+            magicSquare[int(i)][int(j)] = num
+            num = num + 1
 
-            j = j + 1
-            i = i - 1  # 1st condition
+        j = j + 1
+        i = i - 1  # 1st condition
 
-        # Printing magic square
-        print("Magic Squre for n =", n)
-        print("Sum of each row or column",
-              n * (n * n + 1) / 2, "\n")
+    # Printing magic square
+    print("Magic Squre for n =", n)
+    print("Sum of each row or column",
+          n * (n * n + 1) / 2, "\n")
 
-        for i in range(0, n):
-            for j in range(0, n):
-                print('%2d ' % (magicSquare[i][j]),
-                      end='')
-
-                # To display output
-                # in matrix form
-                if j == n - 1:
-                    print()
+    for i in range(0, n):
+        for j in range(0, n):
+            print('%2d ' % (magicSquare[i][j]),
+                  end='')
+            # To display output
+            # in matrix form
+            if j == n - 1:
+                print()
 
 def creat_new_excel():
     import openpyxl
@@ -526,147 +658,97 @@ def error_messages_display():
         print(errMessage)
 # endregion
 
-# region Class group
-class TreeNode:
-    def __init__(self, val=0, left=None, right=None):
-        self.val = val
-        self.left = left
-        self.right = right
-
-class testClassOverride:
-    def __init__(self,name,data):
-        self._name = name
-        self.data = data
-
-    def kk(self,x,y):
-        return x+y
-    @property
-    def name(self):
-        return self._name
-
-    # getattr(testClassOverride('aaa',123),'kk')(2,4) >>> 6
-    # if hasattr(testClassOverride,'kk'): >>> True
-
-class overridetest(testClassOverride):
-    def __init__(self,name,data):
-        testClassOverride.__init__(self,name,data)
-        # or  -> super().__init__(name,data)
-
-    def kk(self,x,y):
-        return x*y
-
-class ListNode:
-    def __init__(self, val=0, next=None):
-        self.val = val
-        self.next = next
-
-class SingleLinkedList:
-    def __init__(self):
-      self.head = None
-      self.tail = None
-
-    def add_list_item(self, item):
-        if not isinstance(item, ListNode):
-            item = ListNode(item)
-        if self.head is None:
-            self.head = item
-        else:
-            self.tail.next = item
-        self.tail = item
-
-class magic_square:
-    def sub_square(self, grid):
-        matrix = []
-        '''
-        for x in range(len(grid) - 2):
-            for y in range(len(grid[0]) - 2):
-                sub_matrix = []
-                tempmatrix.append(grid[x][y:y + 3])
-                tempmatrix.append(grid[x + 1][y: y + 3])
-                tempmatrix.append(grid[x + 2][y: y + 3])
-                matrix.append(sub_matrix)
-        '''
-
-        for row in range(len(grid) - 2): # -2 : mean is want n*n sub matrix range(len(grid) - (n-1))
-            for col in range(len(grid[0]) - 2): # -2 : mean is want n*n sub matrix range(len(grid) - (n-1))
-                # i and j mean is want n*n sub matrix range(n)
-                sub_matrix = [[grid[row + i][col + j] for j in range(3)] for i in range(3)]
-                matrix.append(sub_matrix)
-
-        return matrix
-
-    def is_magic_square(self, matrix):
-        '''
-        #----------检查条件1-9
-        digit = 0 for i in range(0, 10)]
-
-        for row in ma:
-            for d in row:
-                if d > 9:
-                    return False
-                digit[d] = 0
-
-        for i in range(1, 10):
-            if digit[i] != 0:
-                return False
-
-        #----检查每一行
-        s = sum(ma[0])
-
-        for i in range(1, 3):
-            if sum(ma[i]) != s:
-                return False
-
-        #---检查对角线
-        sdia = 0
-        for i in range(0, 3):
-            sdia +=ma[i][i]
-        if sdia != s:
-            return False
-
-        sdia -= ma[2][0] + ma[1][1] + ma[0][2]
-        if sdia != 0:
-            return False
-
-        #---检查每一列
-        for j in range(0, 3):
-            sc = 0
-            for i in range(0,3):
-                sc += ma[i][j]
-            if sc != s:
-                return False
-
-        return True
-        '''
-
-        is_number_right = all(1 <= matrix[i][j] <= 9 for i in range(3) for j in range(3)) # i and j mean is want n*n sub matrix range(n)
-        is_row_right = all(sum(row) == 15 for row in matrix) # == 15 mean is magic square sum() = n(n^2+1)/2
-        is_col_right = all(sum(col) == 15 for col in [[matrix[i][j] for i in range(3)] for j in range(3)]) # i and j mean is want n*n sub matrix range(n)
-        is_diagonal_right = matrix[1][1] == 5 and matrix[0][0] + matrix[-1][-1] == 10 and matrix[0][-1] + \
-                            matrix[-1][0] == 10 # 5 is in matrix central and sum corner == 10
-        is_repeat_right = len(set(matrix[i][j] for i in range(3) for j in range(3))) == 9  # i and j mean is want n*n sub matrix range(n)
-        return is_number_right and is_row_right and is_col_right and is_diagonal_right and is_repeat_right
-
-class ttest:
-
-    def total(self,a,b):
-        return a+b
-
-def reverseList(head):
-    prev = None
-
-    while head:
-        current = head
-        head = head.next
-        current.next = prev
-        prev = current
-    return prev
-
-# endregion
 
 if __name__ == '__main__':
     try:
-        f = [1,2,3,4]
-        
+        '''
+        text1 = "ezupkr"
+        text2 = "ubmrapg"
+
+        m, n = len(text1), len(text2)
+        dp = [[0 for _ in range(n)] for _ in range(m)]
+
+        if text1[0] == text2[0]:
+            dp[0][0] = 1
+
+        for j in range(1, n):
+            if text2[j] == text1[0]:
+                for k in range(j, n):
+                    dp[0][k] = 1
+                break
+
+            else:
+                dp[0][j] = dp[0][0]
+
+        for i in range(1, m):
+            if text1[i] == text2[0]:
+                for k in range(i, m):
+                    dp[k][0] = 1
+                break
+            else:
+                dp[i][0] = dp[0][0]
+
+        for i in range(1, m):
+            for j in range(1, n):
+                if text1[i] == text2[j]:
+                    dp[i][j] = dp[i - 1][j - 1] + 1
+                else:
+                    dp[i][j] = max(dp[i - 1][j], dp[i][j - 1])
+
+        print(dp)
+        print(dp[m-1][n-1])
+        '''
+
+        '''
+        def dfs(board, word, char, visited, i, j):
+            if char >= len(word):
+                return True
+
+            if i + 1 < len(board) and board[i + 1][j] == word[char] and not visited[i + 1][j]:
+                visited[i + 1][j] = 1
+
+                result = dfs(board, word, char + 1, visited, i + 1, j)
+
+                if result:
+                    return True
+
+                visited[i + 1][j] = 0
+
+            if j + 1 < len(board[0]) and board[i][j + 1] == word[char] and not visited[i][j + 1]:
+                visited[i][j + 1] = 1
+
+                result = dfs(board, word, char + 1, visited, i, j + 1)
+
+                if result:
+                    return True
+
+                visited[i][j + 1] = 0
+
+            if i - 1 >= 0 and board[i - 1][j] == word[char] and not visited[i - 1][j]:
+                visited[i - 1][j] = 1
+
+                result = dfs(board, word, char + 1, visited, i - 1, j)
+
+                if result:
+                    return True
+
+                visited[i - 1][j] = 0
+
+            if j - 1 >= 0 and board[i][j - 1] == word[char] and not visited[i][j - 1]:
+                visited[i][j - 1] = 1
+
+                result = dfs(board, word, char + 1, visited, i, j - 1)
+
+                if result:
+                    return True
+
+                visited[i][j - 1] = 0
+
+            return False
+        '''
+
+        print(2**31 / 65535)
+
+
     except:
         error_messages_display()
