@@ -6,8 +6,8 @@ import bisect
 
 # link list
 class ListNode:
-    def __init__(self, x):
-        self.val = x
+    def __init__(self, val):
+        self.val = val
         self.next = None
 
 class TreeNode:
@@ -43,22 +43,76 @@ class TreeNode:
             if root.left:
                 que.append(root.left)
 
-            if root.right != None:
+            if root.right:
                 que.append(root.right)
 
         return dis
 
     def preorder(self,root,res):
+        '''
         if root:
             res.append(root.value)
             self.preorder(root.left,res)
             self.preorder(root.right,res)
+        '''
+        q = [root]
+
+        while q:
+            node = q.pop()
+            res.append(node.val)
+
+            if node.right:
+                q.append(node.right)
+
+            if node.left:
+                q.append(node.left)
+
 
     def inorder(self,root,res):
+        '''
         if root:
             self.inorder(root.left,res)
             res.append(root.value)
             self.inorder(root.right,res)
+        '''
+        q = []
+
+        while 1:
+            while root:
+                q.append(root)
+                root = root.left
+
+            if not q:
+                break
+
+            root = q.pop()
+            res.append(root.val)
+            root = root.right
+
+    def postorder(self,root,res):
+        '''
+        if root:
+            self.inorder(root.left,res)
+            self.inorder(root.right,res)
+            res.append(root.value)
+        '''
+        q1 = [root]
+        q2 = []
+
+        while q1:
+            node = q1.pop()
+            q2.append(node)
+
+            if node:
+                if node.left:
+                    q1.append(node.left)
+
+                if node.right:
+                    q1.append(node.right)
+
+        while q2:
+            node = q2.pop()
+            res.append(node.val)
 
     def mergeTrees(self, t1, t2):
         '''
@@ -89,15 +143,13 @@ class LeetCode_Easy:
         :return: List[int]
         1. Two Sum
         '''
-        dic = dict()
+        d = dict()
 
         for index,value in enumerate(nums):
-            sub = target - value
+            if target - value in d:
+                return [d[target - value],index]
 
-            if sub in dic:
-                return [dic[sub],index]
-
-            dic[value] = index
+            d[value] = index
 
     def reverse(self,x):
         '''
@@ -159,13 +211,16 @@ class LeetCode_Easy:
         leetcode easy: 13. Roman to Integer
         '''
         roman = {'I':1,'V':5,'X':10,'L':50,'C':100,'D':500,'M':1000}
+
         res = roman[s[-1]]
-        N = len(s)
-        for i in range(N - 2, -1, -1):
-            if roman[s[i]] < roman[s[i + 1]]:
+
+        for i in range(len(s) - 1):
+            if roman[s[i]] < roman[s[i+1]]:
                 res -= roman[s[i]]
+
             else:
                 res += roman[s[i]]
+
         return res
 
     def longestCommonPrefix(self,strs):
@@ -173,7 +228,12 @@ class LeetCode_Easy:
         :param strs: str
         :return: str
         leetcode easy: 14. Longest Common Prefix
+
+        Input: strs = ["flower","flow","flight"]
+        Output: "fl"
         '''
+
+        # sort for strs list let shorter in left side
         for i in range(1,len(strs)):
             if len(strs[i-1]) > len(strs[i]):
                 strs[i-1] , strs[i] = strs[i],strs[i-1]
@@ -203,38 +263,17 @@ class LeetCode_Easy:
         :return: bool
         leetcode easy: 20. Valid Parentheses
         '''
-        if len(s) % 2 != 0:
-            return False
-
         stack = list()
+        d     = {'(': ')', '{': '}', '[': ']'}
 
-        dic = {'(': ')', '{': '}', '[': ']'}
-
-        for i, c in enumerate(s):
-            if s[i] in dic:
-                stack.append(s[i])
+        for c in s:
+            if c in d:
+                stack.append(c)
             else:
-                if len(stack) != 0 and dic[stack[-1]] == s[i]:
-                    stack.pop()
-                else:
+                if len(stack) == 0 or d[stack.pop()] != c:
                     return False
-        if stack:
-            return False
-        else:
-            return True
 
-    def valid_parentheses(self,st):
-        '''
-        :param st: str
-        :return: bool
-        codewar
-        '''
-        cnt = 0
-        for char in st:
-            if char == '(': cnt += 1
-            if char == ')': cnt -= 1
-            if cnt < 0: return False
-        return True if cnt == 0 else False
+        return len(stack) == 0
 
     def mergeTwoLists(self, l1, l2):
         '''
@@ -243,27 +282,16 @@ class LeetCode_Easy:
         :return: Optional[ListNode]
         leetcode easy: 21. Merge Two Sorted Lists
         '''
-        num1 = ''
-        num2 = ''
+        if not l1 or not l2:
+            return l1 or l2
 
-        while l1:
-            num1 += str(l1.val)
-            l1 = l1.next
+        if l1.val < l2.val:
+            l1.next = self.mergeTwoLists(l1.next, l2)
+            return l1
 
-        while l2:
-            num2 += str(l2.val)
-            l2 = l2.next
-
-        total = str(int(num1[::-1]) + int(num2[::-1]))[::-1]
-
-        head = ListNode(int(total[0]))
-        ans = head
-
-        for i in total[1:]:
-            head.next = ListNode(int(i))
-            head = head.next
-
-        return ans
+        else:
+            l2.next = self.mergeTwoLists(l1, l2.next)
+            return l2
 
     def removeDuplicates(self,nums):
         '''
@@ -272,14 +300,13 @@ class LeetCode_Easy:
         :return:int
         leetcode easy: 26. Remove Duplicates from Sorted Array
         '''
-        if not nums:
-            return 0
-        i, j = 0, 1
-        while j < len(nums):
-            if nums[i] != nums[j]:
+        i = 0
+
+        for j in range(len(nums)):
+            if nums[j] != nums[i]:
                 i += 1
                 nums[i] = nums[j]
-            j += 1
+
         return i + 1
 
     def removeElement1(self,nums, val):
@@ -371,6 +398,24 @@ class LeetCode_Easy:
 
         return res
 
+    def maxsunarry(self,nums):
+        '''
+        :param nums: int
+        :return: int
+        leetcode easy: 53. Maximum Subarray
+        Input: nums = [-2,1,-3,4,-1,2,1,-5,4]
+        Output: 6
+        Explanation: [4,-1,2,1] has the largest sum = 6.
+        '''
+        # it's non dynamic program solution
+        max_ending = max_current = nums[0]
+
+        for num in nums[1:]:
+            max_ending  = max(num, max_ending + num)
+            max_current = max(max_current, max_ending)
+
+        return max_current
+
     def lengthOfLastWord(self,s):
         '''
         :param s: str
@@ -378,6 +423,34 @@ class LeetCode_Easy:
         leetcode easy: 58. Length of Last Word
         '''
         return len(s.rstrip().split(' ')[-1])
+
+    def plusOne(self, digits):
+        '''
+        :param digits: List[int]
+        :return: List[int]
+        leetcode easy: 66. Plus One
+
+        Input: digits = [4,3,2,1]
+        Output: [4,3,2,2]
+        Input: digits = [9]
+        Output: [1,0]
+        '''
+        # solution of python built-in of str method
+        # return [int(i) for i in str(int(''.join([str(n) for n in digits]))+1)]
+
+        carry_over = 0
+
+        digits[-1] += 1
+
+        for i in range(len(digits) - 1, -1, -1):
+            digits[i] += carry_over
+            carry_over = digits[i] // 10
+            digits[i] %= 10
+
+        if carry_over != 0:
+            digits.insert(0, carry_over)
+
+        return digits
 
     def addBinary(self,a, b):
         '''
@@ -407,7 +480,7 @@ class LeetCode_Easy:
         # str(bin(suma+sumb))[2:]
         return ans
 
-    def merge1(self, nums1, m, nums2, n):
+    def merge(self, nums1, m, nums2, n):
         """
         :type nums1: List[int]
         :type m: int
@@ -416,42 +489,27 @@ class LeetCode_Easy:
         :rtype: void Do not return anything, modify nums1 in-place instead.
         leetcode easy: 88. Merge Sorted Array
         """
-        i, j = m - 1, n - 1
-        k = m + n - 1
-        while i >= 0 and j >= 0:
-            if nums1[i] > nums2[j]:
-                nums1[k] = nums1[i]
-                i -= 1
-            else:
-                nums1[k] = nums2[j]
-                j -= 1
-            k -= 1
-        while j >= 0:
-            nums1[k] = nums2[j]
-            j -= 1
-            k -= 1
+        p1 = m - 1
+        p2 = n - 1
 
-    def merge2(self, nums1, m, nums2, n):
-        """
-        :type nums1: List[int]
-        :type m: int
-        :type nums2: List[int]
-        :type n: int
-        :rtype: void Do not return anything, modify nums1 in-place instead.
-        leetcode easy: 88. Merge Sorted Array
-        """
-        nums1 = nums1[m:] + nums1[:m]
-        nums2.sort()
-        for num in nums2:
-            for index, value in enumerate(nums1):
-                if num < value:
-                    nums1.insert(index, num)
-                    nums1.pop(0)
-                    break
-                if index == len(nums1) - 1 and value < num:
-                    nums1.append(num)
-                    nums1.pop(0)
-                    break
+        for p in range(n + m - 1, -1, -1):
+            if p2 < 0:
+                break
+
+            elif p1 >= 0 and nums1[p1] > nums2[p2]:
+                nums1[p] = nums1[p1]
+                p1 -= 1
+
+            else:
+                nums1[p] = nums2[p2]
+                p2 -= 1
+
+        '''
+        # using build-in sort method
+        for i in range(n):
+            nums1[m+i] = nums2[i]
+        nums1.sort()
+        '''
 
     def isSameTree(self,p, q):
         '''
@@ -493,6 +551,62 @@ class LeetCode_Easy:
         else:
             return False
 
+    def isSymmetric(self, root):
+        '''
+        :param root: Optional[TreeNode]
+        :return: bool
+        leetcode easy: 101. Symmetric Tree
+        '''
+        '''
+        nums = [1,2,2,3,4,4,3,5,6,7,8,8,7,6,5]
+        
+        root = TreeNode(val   = 1,                        
+                        left  = TreeNode(val   = 2,
+                                         left  = TreeNode(val   = 3,
+                                                          left  = TreeNode(5),
+                                                          right = TreeNode(6)
+                                                          ),
+                                         right = TreeNode(val   = 4,
+                                                          left  = TreeNode(7),
+                                                          right = TreeNode(8)
+                                                          )
+                                         ),               
+                        right = TreeNode(val   = 2,
+                                         left  = TreeNode(val   = 4,
+                                                          left  = TreeNode(8),
+                                                          right = TreeNode(7)
+                                                          ),
+                                         right = TreeNode(val   = 3,
+                                                          left  = TreeNode(6),
+                                                          right = TreeNode(5)
+                                                          )
+                                         )
+                        )
+        '''
+
+        def isMirror(left, right):
+            '''
+            :param left: TreeNode
+            :param right: TreeNode
+            :return: bool
+            '''
+            if not left and not right:
+                return True
+
+            elif not left or not right:
+                return False
+
+            elif left.val != right.val:
+                return False
+
+            else:
+                return isMirror(left.left, right.right) and isMirror(left.right, right.left)
+
+        if not root:
+            return True
+
+        return isMirror(root.left, root.right)
+
     def levelOrderBottom(self, root):
         '''
         :param root: TreeNode
@@ -533,16 +647,17 @@ class LeetCode_Easy:
         :return: List[List[int]]
         leetcode easy: 118. Pascal's Triangle
         '''
-        output = [[] for _ in range(numRows)]
+        Pascal = [[] for _ in range(numRows)]
 
         for i in range(numRows):
             for j in range(i + 1):
                 if 0 < j < i:
-                    output[i].append(output[i - 1][j - 1] + output[i - 1][j])
-                else:
-                    output[i].append(1)
+                    Pascal[i].append(Pascal[i - 1][j - 1] + Pascal[i - 1][j])
 
-        return output
+                else:
+                    Pascal[i].append(1)
+
+        return Pascal
 
     def maxProfit(self, prices):
         '''
@@ -552,11 +667,12 @@ class LeetCode_Easy:
         :return: int
         leetcode easy: 121. Best Time to Buy and Sell Stock
         '''
-        minPrice = float('inf')
-        profit   = 0
+        minPrice = prices[0]
 
-        for price in prices:
-            if minPrice > price:
+        profit = 0
+
+        for price in prices[1:]:
+            if price < minPrice:
                 minPrice = price
 
             if price - minPrice > profit:
@@ -582,47 +698,17 @@ class LeetCode_Easy:
         else:
             return False
 
-    def sig1(self,nums):
+    def singleNumber(self,nums):
         """
         :type nums: List[int]
         :rtype: int
         leetcode easy: 136. Single Number
         """
-        num = [nums.count(i) for i in nums]
-        return nums[num.index(1)]
-
-    def singleNumber2(self,A):
-        one = 0; two = 0; three = 0
-        for i in range(len(A)):
-            two |= A[i] & one
-            one = A[i] ^ one
-            three = ~(one & two)
-            one &= three
-            two &= three
-        return one
-
-    def singNum3(self,nums):
-        res = 0
-        for i in range(32):
-            cnt = 0
-            mask = 1 << i
-            for num in nums:
-                if num & mask:
-                    cnt += 1
-            if cnt % 3 == 1:
-                res |= mask
-        if res >= 2 ** 31:
-            res -= 2 ** 32
-        return res
-
-    def singleNumber4(self,nums):
-        """
-        :type nums: List[int]
-        :rtype: int
-        """
         res = nums[0]
-        for i in range(1, len(nums)):
-            res ^= nums[i]
+
+        for num in nums[1:]:
+            res ^= num
+
         return res
 
     def convertToTitle(self, n):
@@ -666,6 +752,43 @@ class LeetCode_Easy:
 
         return res
 
+    def reverseBits(self, n):
+        '''
+        :param n: int
+        :return: int
+        leetcode easy: 190. Reverse Bits
+        Input: n = 00000010100101000001111010011100
+        Output:    964176192 (00111001011110000010100101000000)
+        '''
+        # using build-in library transform to string type then convert to int type.
+        # return int(bin(n)[2:].zfill(32)[::-1], 2)
+
+        res = 0
+
+        for i in range(32):
+            bit = (n >> i) & 1 # check has bit == 1
+            res |= (bit << (31 - i)) # shift to reverse position then 'or'/'add' previous res
+
+        return res
+
+    def rob(self, nums):
+        '''
+        :param nums: List[int]
+        :return: int
+        leetcode medium: 198. House Robber
+
+        Input: [2,7,9,3,1]
+        Output: 12
+        '''
+        # it's non dp solution
+
+        rob1, rob2 = 0, 0
+
+        for num in nums:
+            rob1 , rob2 = rob2 , max(num + rob1, rob2)
+
+        return rob2
+
     def isHappy(self, n):
         '''
         :param n: int
@@ -705,12 +828,48 @@ class LeetCode_Easy:
 
         return sum(output)
 
+    def isPowerOfTwo(self, n):
+        '''
+        :param n: int
+        :return: bool
+        leetcode easy: 231. Power of Two
+
+        Input: n = 16
+        Output: true
+        Explanation: 24 = 16
+
+        Input: n = 3
+        Output: false
+        '''
+        # return n > 0 and n & (n-1) == 0
+
+        if n < 1:
+            return False
+
+        while n % 2 == 0:
+            n /= 2
+
+        return n == 1
+
+    def missingNumber(self, nums):
+        '''
+        :param nums: List[int]
+        :return: int
+        leetcode easy: 268. Missing Number
+        Input: nums = [9,6,4,2,3,5,7,0,1]
+        Output: 8
+        '''
+        # sum(arithmetic sequence) = (n+1)n/2
+        return (len(nums) + 1) * len(nums) // 2 - sum(nums)
+
     def moveZeroes(self, nums):
         '''
         :param nums: List[int]
         :return: None
         leetcode easy: 283. Move Zeroes
         Duobple pointer
+        Input: nums = [0,1,0,3,12]
+        Output: [1,3,12,0,0]
         '''
         """
         Do not return anything, modify nums in-place instead.
@@ -719,12 +878,26 @@ class LeetCode_Easy:
 
         for i in range(len(nums)):
             if nums[i] != 0:
-                nums[index] = nums[i]
+                nums[index] , nums[i] = nums[i] , nums[index]
                 index += 1
 
-        if index:
-            for i in range(index, len(nums)):
-                nums[i] = 0
+    def isPowerOfThree(self, n: int) -> bool:
+        '''
+        :param n: int
+        :return: boot
+        leetcode easy: 326. Power of Three
+        Input: n = 27
+        Output: true
+
+        This way can finish any number of power of number
+        '''
+        if n < 1:
+            return False
+
+        while n % 3 == 0:
+            n /= 3
+
+        return n == 1
 
     def reverseString(self, s):
         '''
@@ -743,16 +916,15 @@ class LeetCode_Easy:
         :return: List[int]
         leetcode easy: 350. Intersection of Two Arrays II
         '''
-        d1 = collections.Counter(nums1)
-        d2 = collections.Counter(nums2)
+        d = collections.Counter(nums1)
+        res = []
 
-        ans = []
+        for n in nums2:
+            if d[n] > 0:
+                res.append(n)
+                d[n] -= 1
 
-        for i in d1:
-            if i in d2:
-                ans.extend([i] * min(d1[i], d2[i]))
-
-        return ans
+        return res
 
     def isPerfectSquare(self, num):
         '''
@@ -780,6 +952,31 @@ class LeetCode_Easy:
                 return False
 
         return True
+
+    def isSubsequence(self, s: str, t: str) -> bool:
+        '''
+        :param s : str
+        :param t : str
+        :return: bool
+        leetcode easy: 392. Is Subsequence
+
+        Input: s = "abc", t = "ahbgdc"
+        Output: true
+        '''
+        if not s:
+            return True
+
+        pos = 0
+
+        for char in t:
+            if pos <= len(s) - 1:
+                if char == s[pos]:
+                    pos += 1
+
+        if pos == len(s):
+            return True
+
+        return False
 
     def sumOfLeftLeaves(self, root):
         '''
@@ -848,15 +1045,19 @@ class LeetCode_Easy:
         :return: int
         leetcode easy : 461. Hamming Distance
         '''
+        # solution : do x XOR y first then count how many bit == '1'
+
         distance = 0
         n = x ^ y
 
         while n > 0:
-            if n & 1 != 0:
+            if n & 1:
                 distance += 1
 
-            n = n >> 1
+            n = n >> 1 # n // 2
+
         return distance
+        # return bin(x ^ y).count('1')
 
     def islandPerimeter(self, grid):
         '''
@@ -878,6 +1079,28 @@ class LeetCode_Easy:
                         output -= 2
 
         return output
+
+    def findComplement(self, num):
+        '''
+        :param num: int
+        :return: int
+        leetcode easy : 476. Number Complement
+
+        Input: num = 5
+        Output: 2
+        Explanation: 101 -> 010
+        '''
+        # this solution is num all bit XOR 1111...11 can getting num complement
+        # Note: This question is the same as 1009
+
+        # return 2 ** (len(bin(n)) - 2) - 1 - n
+
+        x = 1
+
+        while x <= num:
+            x <<= 1 # ->> x *= 2 , this operation is count how many bit of num of binary representation.
+
+        return (x - 1) ^ num
 
     def matrixReshape(self, nums, r, c):
         '''
@@ -991,6 +1214,44 @@ class LeetCode_Easy:
                 counter += 1
 
         return counter
+
+    def middleNode(self, head):
+        '''
+        :param head: Optional[ListNode]
+        :return: Optional[ListNode]
+        leetcode easy: 876. Middle of the Linked List
+
+        Input: head = [1,2,3,4,5]
+        Output: [3,4,5]
+        Explanation: The middle node of the list is node 3
+        '''
+        '''
+        # solution of count head index
+        length = 0
+        curr = head
+
+        while curr:
+            length += 1
+            curr = curr.next
+
+
+        index = 0
+        curr = head
+
+        while index < (length // 2):
+            curr = curr.next
+            index += 1
+
+        return curr
+        '''
+        slow = head
+        fast = head
+
+        while fast and fast.next:
+            slow = slow.next
+            fast = fast.next.next
+
+        return slow
 
     def projectionArea(self, grid):
         """
@@ -1233,19 +1494,52 @@ class LeetCode_Easy:
 
         return min(d1, d2)
 
+    def minimumAbsDifference(self, arr):
+        '''
+        :param arr: List[int]
+        :return: List[List[int]]
+        leetcode easy: 1200. Minimum Absolute Difference
+        Input: arr = [4,2,1,3]
+        Output: [[1,2],[2,3],[3,4]]
+        Explanation: The minimum absolute difference is 1. List all pairs with difference equal to 1 in ascending order.
+        '''
+        arr.sort()
+
+        if len(arr) == 2:
+            return [[arr[0], arr[1]]]
+
+        res = [[arr[0], arr[1]]]
+        diff = arr[1] - arr[0]
+
+        for i in range(2, len(arr)):
+            if arr[i] - arr[i - 1] < diff:
+                diff = arr[i] - arr[i - 1]
+                res = [[arr[i - 1], arr[i]]]
+
+            elif arr[i] - arr[i - 1] == diff:
+                res.append([arr[i - 1], arr[i]])
+
+        return res
+
     def minCostToMoveChips(self, position):
         '''
         :param position: List[int]
         :return: int
         leetcode easy: 1217. Minimum Cost to Move Chips to The Same Position
+
+        Input: position = [1,2,3]
+        Output: 1
+        explain solution: compare which are smaller between move all chips to 1th and move all chips to 2th
         '''
-        odd_numbers = 0
+        odd_numbers  = 0
         even_numbers = 0
+
         for num in position:
             if num % 2 == 0:
                 even_numbers += 1
             else:
                 odd_numbers += 1
+
         return min(odd_numbers, even_numbers)
 
     def checkStraightLine(self, coordinates):
@@ -1266,6 +1560,35 @@ class LeetCode_Easy:
                 k = (coordinates[i][1] - coordinates[i-1][1])/(coordinates[i][0] - coordinates[i-1][0])
             ans.append(k)
         return len(set(ans)) == 1
+
+    def kWeakestRows(self, mat, k):
+        '''
+        :param mat:List[List[int]]
+        :param k: int
+        :return: List[int]
+        leetcode easy: 1337. The K Weakest Rows in a Matrix
+        '''
+        d = {i:sum(mat[i]) for i in range(len(mat))}
+        return [i[0] for i in sorted(d.items(),key=lambda item:item[1])[:k]]
+
+    def getDecimalValue(self, head):
+        '''
+        :param head: ListNode
+        :return: int
+        Input: head = [1,0,1]
+        Output: 5
+        Explanation: (101) in base 2 = (5) in base 10
+        '''
+        ans = 0
+
+        while head:
+            ans *= 2
+
+            ans += head.val
+
+            head = head.next
+
+        return ans
 
     def checkIfExist(self, arr):
         '''
@@ -1327,16 +1650,6 @@ class LeetCode_Easy:
                 return [i]
         return []
 
-    def kWeakestRows(self, mat, k):
-        '''
-        :param mat:List[List[int]]
-        :param k: int
-        :return: List[int]
-        1337. The K Weakest Rows in a Matrix
-        '''
-        d = {i:sum(mat[i]) for i in range(len(mat))}
-        return [i[0] for i in sorted(d.items(),key=lambda item:item[1])[:k]]
-
     def countOdds(self, low, high):
         '''
         :param low:  int
@@ -1388,7 +1701,7 @@ class LeetCode_Easy:
         :param arr: List[int]
         :param pieces: List[List[int]]
         :return: bool
-        leetcode easy:  1640. Check Array Formation Through Concatenation
+        leetcode easy: 1640. Check Array Formation Through Concatenation
         Input: arr = [49,18,16], pieces = [[16,18,49]] ,Output: false
         Input: arr = [91,4,64,78], pieces = [[78],[4,64],[91]], Output: true
         '''
@@ -1403,23 +1716,31 @@ class LeetCode_Easy:
 
         return ans == arr
 
+    def countEven(self, num):
+        '''
+        :param num: int
+        :return: int
+        leetcode easy: 2180. Count Integers With Even Digit Sum
+
+        Input: num = 30
+        Output: 14
+        Explanation:
+        The 14 integers less than or equal to 30 whose digit sums are even are
+        2, 4, 6, 8, 11, 13, 15, 17, 19, 20, 22, 24, 26, and 28.
+        '''
+        n, dSum = num, 0
+
+        # Calculate digit sum of numbers
+        while n > 0:
+            dSum += n % 10
+            n //= 10
+
+        if num % 2 == 0 and dSum % 2 == 1:
+            return num // 2 - 1
+
+        return num//2
+
 class LeetCode_Medium:
-    def vampire_number(self,x,y):
-        xy = x*y
-        if len(str(xy)) != len(str(x))+len(str(y)):
-            return False
-
-        xy_list = list(str(x))+(list(str(y)))
-
-        for i in xy_list:
-            if i not in str(xy):
-                return False
-            else:
-                if list(str(xy)).count(i) != xy_list.count(i):
-                    return False
-
-        return True
-
     def addTwoNumbers(self, l1, l2):
         '''
         :param l1: Optional[ListNode]
@@ -1865,39 +2186,12 @@ class LeetCode_Medium:
         """
         Do not return anything, modify matrix in-place instead.
         """
-        '''
-        for i in range(len(matrix) // 2):
-            for j in range(i, len(matrix) - i - 1):
-                pointer                    = matrix[i][j]
-                matrix[i][j]               = matrix[-(j + 1)][i]
-                matrix[-(j + 1)][i]        = matrix[-(i + 1)][-(j + 1)]
-                matrix[-(i + 1)][-(j + 1)] = matrix[j][-(i + 1)]
-                matrix[j][-(i + 1)]        = pointer
-        '''
-
-        '''
-        left  = 0
-        right = len(matrix) - 1
-
-        while left < right:
-            matrix[left], matrix[right] = matrix[right], matrix[left]
-
-            left  += 1
-            right -= 1
-
-        for i in range(len(matrix)):
-            for j in range(i):
-                matrix[i][j], matrix[j][i] = matrix[j][i], matrix[i][j]
-        '''
 
         for i in range(len(matrix)):
             for j in range(i,len(matrix)):
-                if i == j:
-                    continue
-
-                # transpose
-                matrix[i][j] , matrix[j][i] = matrix[j][i] ,matrix[i][j]
-
+                if i != j:
+                    # transpose
+                    matrix[i][j] , matrix[j][i] = matrix[j][i] ,matrix[i][j]
             # reverse by row
             matrix[i] = matrix[i][::-1]
 
@@ -1910,7 +2204,7 @@ class LeetCode_Medium:
         D = dict()
 
         for i in strs:
-            isort = ''.join(sorted(list(i)))
+            isort = ''.join(sorted(i))
 
             if isort in D:
                 D[isort].append(i)
@@ -2251,6 +2545,20 @@ class LeetCode_Medium:
                     visited[i][j] = 0
         return False
 
+    def numTrees(self, n):
+        '''
+        :param n: int
+        :return: int
+        leetcode medium: 96. Unique Binary Search Trees
+        '''
+
+        res = 1
+        
+        for i in range(n):
+            res = res * 2 * (2 * i + 1) // (i + 2)
+            
+        return res
+
     def levelOrder(self, root):
         '''
         :param root: TreeNode
@@ -2374,6 +2682,97 @@ class LeetCode_Medium:
 
         return res
 
+    def singleNumberII(self, nums):
+        '''
+        :param nums: List[int]
+        :return: int
+        leetcode medium: 137. Single Number II
+        Input: nums = [0,1,0,1,0,1,99]
+        Output: 99
+        '''
+        '''
+        let each number to three and sum , then subtract sum(nums) then divide the result by 2 is answer
+        return (3 * sum(set(nums)) - sum(nums)) // 2
+        '''
+
+        one = two = 0
+
+        for n in nums:
+            # 1 & ~1 = 0
+            one = (one ^ n) & ~two # if n in one both n in two ,& ~two == (n & ~n)
+            two = (two ^ n) & ~one
+
+        return one
+
+    def reorderList(self, head):
+        '''
+        :param head: Optional[ListNode]
+        :return: None
+        leetcode medium: 143. Reorder List
+
+        # class ListNode:
+        #     def __init__(self, val=0, next=None):
+        #         self.val = val
+        #         self.next = next
+
+        Input: head = [1,2,3,4,5]
+        Output: [1,5,2,4,3]
+        '''
+        """
+        Do not return anything, modify head in-place instead.
+        """
+        slow = head
+        fast = head
+
+        while fast.next and fast.next.next:
+            slow = slow.next
+            fast = fast.next.next
+
+        head2 = slow.next
+        slow.next = None
+
+        prev = None
+        curr = head2
+
+        while curr:
+            temp = curr.next
+            curr.next = prev
+            prev = curr
+            curr = temp
+
+        head2 = prev
+
+        head1 = head
+
+        while head1 and head2:
+            temp1 = head1.next
+            temp2 = head2.next
+            head1.next = head2
+            head2.next = temp1
+            head2 = temp2
+            head1 = temp1
+
+    def maxProduct(self, nums):
+        '''
+        :param nums: List[int]
+        :return: int
+        leetcode medium: 152. Maximum Product Subarray
+        Input: nums = [2,3,-2,4]
+        Output: 6
+        Explanation: [2,3] has the largest product 6.
+        '''
+        result    = nums[0]
+        min_value = nums[0]
+        max_value = nums[0]
+
+        for num in nums[1:]:
+            tmp       = max_value
+            max_value = max(num, tmp * num, min_value * num)
+            min_value = min(num, tmp * num, min_value * num)
+            result    = max(result, min_value, max_value)
+
+        return result
+
     def largestNumber(self, nums):
         '''
         :param nums: List[int]
@@ -2427,10 +2826,12 @@ class LeetCode_Medium:
         """
         Do not return anything, modify nums in-place instead.
         """
+        # This solution is use -k % len(nums) (if k > len(nums) to reorganize nums self
+        # nums[:] = nums[-k % len(nums):] + nums[:-k % len(nums)]
+
         while k:
-            a = nums.pop(-1)
-            nums.insert(0,a)
-            k-=1
+            nums.insert(0,nums.pop())
+            k -= 1
 
     def numIslands(self, grid):
         '''
@@ -2501,6 +2902,121 @@ class LeetCode_Medium:
                 ind += 1
 
         return l if l != float('inf') else 0
+
+    def findOrder(self, numCourses, prerequisites):
+        '''
+        :param numCourses: int
+        :param prerequisites: List[List[int]]
+        :return: List[int]
+        leetcode medium: 210. Course Schedule II
+
+        Input: numCourses = 4, prerequisites = [[1,0],[2,0],[3,1],[3,2]]
+        Output: [0,2,1,3] or [0,1,2,3]
+
+        Explanation: There are a total of 4 courses to take.
+        To take course 3 you should have finished both courses 1 and 2.
+        Both courses 1 and 2 should be taken after you finished course 0.
+        So one correct course order is [0,1,2,3]. Another correct ordering is [0,2,1,3]
+        '''
+        indegree = [0] * numCourses
+        edge = collections.defaultdict(list)
+
+        for x, y in prerequisites:
+            indegree[x] += 1
+            edge[y].append(x)
+
+        q = [i for i in range(numCourses) if indegree[i] == 0]
+        res = []
+
+        while q:
+            cur = q.pop()
+            res.append(cur)
+
+            for n in edge[cur]:
+                indegree[n] -= 1
+
+                if indegree[n] == 0:
+                    q.append(n)
+
+        return res if len(res) == numCourses else []
+
+    def maximalSquare(self, matrix):
+        '''
+        :param matrix: List[List[str]]
+        :return: int
+        leetcode medium: 221. Maximal Square
+
+        Input: matrix = [["1","0","1","0","0"],
+                         ["1","0","1","1","1"],
+                         ["1","1","1","1","1"],
+                         ["1","0","0","1","0"]]
+        Output: 4
+
+        this question has DP solution and more quickly
+        '''
+        def longestConsectutive1Bits(n):
+            c = 0
+
+            while n:
+                n &= n << 1
+                c += 1
+            return c
+
+        m = len(matrix)
+        n = len(matrix[0])
+
+        rols = []
+        maxsqlen = 0
+        # turn each row into a number
+        # time O(mn)
+        for r in range(m):
+            v = 0
+            for c in range(n - 1, -1, -1):
+                v += int(matrix[r][c]) << (n - c - 1)
+            if v > 0:  # there are at least one 1
+                maxsqlen = 1
+            rols.append(v)
+
+        # iterate each value at ith againt the rest (i+1 to m-1)
+        for (i, n) in enumerate(rols):
+            # pruning when the rest operation cannot find a L which is greater than maxsqlen
+            if maxsqlen >= m - i:
+                break
+            for j in range(i + 1, m):
+                n &= rols[j]
+                L = j - i + 1
+                # if there is a squre in the rows between i and j,
+                # which the length is graeter than L,
+                # there must be at least L consectutive 1 bits.
+                if longestConsectutive1Bits(n) < L:
+                    break
+
+                maxsqlen = max(maxsqlen, L)
+
+        return maxsqlen * maxsqlen
+
+    def singleNumberIII(self, nums):
+        '''
+        :param nums: List[int]
+        :return: List[int]
+        leetcode medium: 260. Single Number III
+        Input: nums = [1,2,1,3,2,5]
+        Output: [3,5]
+        '''
+        bitmask = nums[0]
+
+        for num in nums[1:]: # if same number XOR = 0
+            bitmask ^= num
+
+        num1 = bitmask
+
+        for num in nums:
+            if num ^ bitmask > num: # This step is find bigger of the 2 numbers
+                num1 ^= num
+
+        num2 = num1 ^ bitmask
+
+        return [num1, num2]
 
     def numSquares(self,n):
         '''
@@ -2611,6 +3127,38 @@ class LeetCode_Medium:
 
         return max(dp[-1])
 
+    def oddEvenList(self, head):
+        '''
+        :param head: : Optional[ListNode]
+        :return: : Optional[ListNode]
+        leetcode medium: 328. Odd Even Linked List
+        Input: head = [2,1,3,5,6,4,7]
+        Output: [2,3,6,7,1,5,4]
+        '''
+        if not head or not head.next or not head.next.next:
+            return head
+
+        origin_head = head
+        odds = head
+        evens = head.next
+        origin_evens = evens
+        previor = odds
+
+        while evens and evens.next:
+            odds.next = evens.next
+            evens.next = evens.next.next
+            evens = evens.next
+            previor = odds
+            odds = odds.next
+
+        if not odds:
+            previor.next = origin_evens
+
+        else:
+            odds.next = origin_evens
+
+        return origin_head
+
     def topKFrequent(self, nums, k):
         '''
         :param nums: List[int]
@@ -2620,6 +3168,48 @@ class LeetCode_Medium:
         '''
         d = collections.Counter(nums)
         return [i[0] for i in sorted(d.items(),key=lambda item:item[1])][::-1][:k]
+
+    def largestDivisibleSubset(self, nums):
+        '''
+        :param nums: List[int]
+        :return: List[int]
+        leetcode medium: 368. Largest Divisible Subset
+        Input: nums = [1,2,3]
+        Output: [1,2]
+        Explanation: [1,3] is also accepted.
+
+        Input: nums = [1,2,4,8]
+        Output: [1,2,4,8]
+        '''
+        if not nums:
+            return []
+
+        nums.sort()
+        dp = [0] * len(nums)
+
+        # used to construct the subset after we find the largest size
+        construct = [-1] * len(nums)
+        best, best_i = -1, -1
+
+        for i in range(len(nums)):
+            for j in range(i):
+                if nums[i] % nums[j] == 0 and dp[i] < dp[j]:
+                    construct[i], dp[i] = j, dp[j]
+
+            dp[i] += 1
+
+            if dp[i] > best:
+                best, best_i = dp[i], i
+        # print(dp, construct)
+
+        # construct the result
+        result = [nums[best_i]]
+
+        while (construct[best_i] > -1):
+            best_i = construct[best_i]
+            result.append(nums[best_i])
+
+        return result[::-1]
 
     def getSum(self, a, b):
         """
@@ -2719,6 +3309,24 @@ class LeetCode_Medium:
             cnt += 1
         return cnt
 
+    def canPartition(self, nums):
+        '''
+        :param nums: List[int]
+        :return: bool
+        leetcode medium: 416. Partition Equal Subset Sum
+
+        Input: nums = [1,5,11,5]
+        Output: true
+        Explanation: The array can be partitioned as [1, 5, 5] and [11].
+        '''
+
+        dp = {0}
+
+        for num in nums:
+            dp = {num - i for i in dp} | {num + i for i in dp}
+
+        return 0 in dp
+
     def findDuplicates(self, nums):
         '''
         :param nums: : List[int]
@@ -2736,6 +3344,56 @@ class LeetCode_Medium:
 
         return ans
         # return [num for num,count in collections.Counter(nums).items() if count == 2]
+
+    def deleteNode(self, root, key):
+        '''
+        :param root: Optional[TreeNode]
+        :param key: int
+        :return: Optional[TreeNode]
+        leetcode medium: 450. Delete Node in a BST
+
+        root = TreeNode(val   = 5,
+                left  = TreeNode(val   = 3,
+                                 left  = TreeNode(val = 2),
+                                 right = TreeNode(val = 4)
+                                 ),
+                right = TreeNode(val   = 6,
+                                 right = TreeNode(val = 7)
+                                 )
+                )
+
+        Input: root = [5,3,6,2,4,null,7], key = 3
+        Output: [5,4,6,2,null,null,7]
+        '''
+        def getMin(root):
+            while root.left:
+                root = root.left
+
+            return root
+
+        if not root:
+            return None
+
+        if root.val < key:
+            root.right = self.deleteNode(root.right, key)
+
+        if root.val > key:
+            root.left = self.deleteNode(root.left, key)
+
+        if root.val == key:
+            if not root.left:
+                return root.right
+
+            if not root.right:
+                return root.left
+
+            minNode = getMin(root.right)
+
+            root.val = minNode.val
+
+            root.right = self.deleteNode(root.right, minNode.val)
+
+        return root
 
     def magicalString(self, n):
         '''
@@ -2938,26 +3596,6 @@ class LeetCode_Medium:
 
         return maxd
 
-    def sumlist(self,nums,target):
-        '''
-        :param nums: List[int]
-        :param target: int
-        :return: List[int]
-        google question
-        '''
-        ans = [] ; tmp = []
-        for num in nums:
-            sub = target - num
-            if sub in nums:
-                tmp.append(sub)
-                tmp.append(num)
-            if len(tmp) != 0 and len(tmp) == 2:
-                tmp = sorted(tmp)
-                if tmp not in ans:
-                    ans.append(tmp)
-                    tmp = []
-        return ans
-
     def findUnsortedSubarray(self, nums):
         '''
         :param nums: List[int]
@@ -3075,6 +3713,55 @@ class LeetCode_Medium:
 
         return dfs(nums, k, 0, target)
 
+    def accountsMerge(self, accounts):
+        '''
+        :param accounts: List[List[str]]
+        :return: List[List[str]]
+        leetcode medium: 721. Accounts Merge
+        Input: accounts = [["John","johnsmith@mail.com","john_newyork@mail.com"],
+                           ["John","johnsmith@mail.com","john00@mail.com"],
+                           ["Mary","mary@mail.com"],
+                           ["John","johnnybravo@mail.com"]]
+
+        Output: [["John","john00@mail.com","john_newyork@mail.com","johnsmith@mail.com"],
+                 ["Mary","mary@mail.com"],
+                 ["John","johnnybravo@mail.com"]]
+        '''
+        graph = collections.defaultdict(set)
+
+        for acct in accounts:
+            center = acct[1]
+            for email in acct[2:]:
+                graph[center].add(email)
+                graph[email].add(center)
+
+        seen = set()
+
+        def dfs(email, acct):
+            stack = [email]
+            seen.add(email)
+
+            while stack:
+                cur = stack.pop()
+                acct.append(cur)
+                for nei in graph[cur]:
+                    if nei not in seen:
+                        seen.add(nei)
+                        stack.append(nei)
+
+        ans = []
+
+        for acct in accounts:
+            name = acct[0]
+            email = acct[1]
+
+            if email not in seen:
+                cur = []
+                dfs(email, cur)
+                ans.append([name] + sorted(cur))
+
+        return ans
+
     def splitListToParts(self, head, k):
         '''
         :param head: : Optional[ListNode]
@@ -3132,6 +3819,61 @@ class LeetCode_Medium:
 
         return ans
 
+    def dailyTemperatures(self, temperatures):
+        '''
+        :param temperatures: List[int]
+        :return: List[int]
+        leetcode medium: 739. Daily Temperatures
+
+        Input: temperatures = [73,74,75,71,69,72,76,73]
+        Output: [1,1,4,2,1,1,0,0]
+        Output: [1,1,4,2,1,1,0,0]
+        '''
+        stack = []
+        answer = [0] * len(temperatures)
+
+        for i in range(len(temperatures) - 1, -1, -1):
+            while stack and temperatures[i] >= temperatures[stack[-1]]:
+                stack.pop()
+
+            if stack:
+                answer[i] = stack[-1] - i
+
+            stack.append(i)
+
+        return answer
+
+    def deleteAndEarn(self, nums):
+        '''
+        :param nums: List[int]
+        :return: int
+        leetcode easy: 740. Delete and Earn
+
+        Input: nums = [3,4,2]
+        Output: 6
+        Explanation: You can perform the following operations:
+        - Delete 4 to earn 4 points. Consequently, 3 is also deleted. nums = [2].
+        - Delete 2 to earn 2 points. nums = [].
+        You earn a total of 6 points.
+        '''
+        c = collections.Counter(nums)
+
+        keys = sorted(c.keys())
+        prev = 0
+
+        ans = cur = c[keys[0]] * keys[0]
+
+        for i in range(1, len(keys)):
+            if keys[i] == keys[i - 1] + 1:
+                prev, cur = cur, max(cur, prev + keys[i] * c[keys[i]])
+
+            else:
+                prev, cur = cur, cur + keys[i] * c[keys[i]]
+
+            ans = max(ans, cur)
+
+        return ans
+
     def reachNumber(self, target):
         '''
         :param target: int
@@ -3176,46 +3918,105 @@ class LeetCode_Medium:
 
         return ans
 
+    def numTilings(self, n):
+        '''
+        :param n: int
+        :return: int
+        leetcode medium: 790. Domino and Tromino Tiling
+        '''
+        if n <= 2:
+            return n
+
+        t1 = 2
+        t2 = 1
+        p1 = 1  # one tromino
+        q  = 10 ** 9 + 7
+
+        for _ in range(3, n + 1):
+            T = t1 + t2 + 2 * p1
+            P = p1 + t2
+
+            t1, t2 = T % q, t1 % q
+            p1 = P % q
+
+        return t1
+
+    def champagneTower(self, poured, query_row, query_glass):
+        '''
+        :param poured: int
+        :param query_row: int
+        :param query_glass: int
+        :return: float
+        leetcode medium: 799. Champagne Tower
+        '''
+        if poured == 0:
+            return 0
+
+        if query_row == 0:
+            return 1
+
+        curr = [poured]
+
+        for row in range(1, query_row + 1):
+            nxt = [0] * (row + 1)
+
+            for i in range(len(curr)):
+                remaining = curr[i] - 1
+
+                if remaining < 0.0:
+                    continue
+
+                nxt[i] += remaining / 2
+                nxt[i + 1] += remaining / 2
+
+            curr = nxt
+
+        return min(curr[query_glass], 1)
+
     def numMagicSquaresInside(self, grid):
         '''
         :param grid:List[List[int]]
         :return: int
         leetcode medium: 840. Magic Squares In Grid
         '''
-        def is_magic(matrix):
-            num = [matrix[i][j] for i in range(len(matrix)) for j in range(len(matrix[0]))]
-            for i in range(1, 10):
-                if i not in num:
-                    return 0
 
-            result = set()
+        def is_magic(i, j):
+            sb_grid = [grid[i]    [j:j + 3],
+                       grid[i + 1][j:j + 3],
+                       grid[i + 2][j:j + 3]]
 
-            for r in matrix:
-                result.add(sum(r))
+            nums = [sb_grid[i][j] for i in range(3) for j in range(3)]
 
-            for c in zip(*matrix):
-                result.add(sum(c))
+            for num in range(1, 10):
+                if num not in nums:
+                    return False
 
-            rdig = 0
-            ldig = 0
-            for i in range(len(matrix)):
-                rdig += matrix[i][i]
-                ldig += matrix[i][len(matrix[0]) - 1 - i]
+            ans = [0, 0]
 
-            result.add(rdig)
-            result.add(ldig)
-            return 1 if len(result) == 1 else 0
+            for sb_i in range(3):
+                ans.append(sum(sb_grid[sb_i]))
+                ans[0] += sb_grid[sb_i][sb_i]
+                ans[1] += sb_grid[sb_i][3 - 1 - sb_i]
+
+            for sb_i in range(3):
+                for sb_j in range(sb_i, 3):
+                    if sb_i != sb_j:
+                        sb_grid[sb_i][sb_j], sb_grid[sb_j][sb_i] = sb_grid[sb_j][sb_i], sb_grid[sb_i][sb_j]
+
+                ans.append(sum(sb_grid[sb_i]))
+
+            return len(set(ans)) == 1
 
         if len(grid) < 3 or len(grid[0]) < 3:
             return 0
 
         count = 0
+
         for i in range(len(grid) - 2):
             for j in range(len(grid[0]) - 2):
-                candi_matrix = [grid[i][j:j + 3], grid[i + 1][j:j + 3], grid[i + 2][j:j + 3]]
-
-                if is_magic(candi_matrix):
+                if is_magic(i, j):
                     count += 1
+
         return count
 
     def canVisitAllRooms(self, rooms):
@@ -3407,21 +4208,53 @@ class LeetCode_Medium:
 
         return root
 
-    def smallestRepunitDivByK(self, K):
+    def smallestRepunitDivByK(self, k):
         '''
         :param K: int
         :return: int
         leetcode medium: 1015. Smallest Integer Divisible by K
         '''
-        if (K % 2 == 0) or (K % 5 == 0):
+        if (k % 2 == 0) or (k % 5 == 0):
             return -1
 
         remainder = 0
 
-        for N in range(1, K+1):
-            remainder = (remainder * 10 + 1) % K
+        for n in range(1, k + 1):
+            remainder = (remainder * 10 + 1) % k # >> 222 = (22*10) + 2 , 5555 = (555*10) + 5
+
             if remainder == 0:
-                return N
+                return n
+
+    def carPooling(self, trips, capacity):
+        '''
+        :param trips: List[List[int]]
+        :param capacity: int
+        :return: bool
+        leetcode medium: 1094. Car Pooling
+
+        Input: trips = [[2,1,5],[3,3,7]], capacity = 4
+        Output: false
+
+        Input: trips = [[2,1,5],[3,3,7]], capacity = 5
+        Output: true
+
+        Input: trips = [[2,1,5],[3,5,7]], capacity = 3
+        Output: true
+        '''
+        passengers = [0] * 1001 # make a list let it match the condition ,
+                                # it each position represent how much passenger in the position at same time
+        for trip in trips:
+            trip_nump = trip[0]
+            trip_from = trip[1]
+            trip_to   = trip[2]
+
+            for i in range(trip_from, trip_to):
+                passengers[i] += trip_nump
+
+                if passengers[i] > capacity: # judge the position have how much passenger
+                    return False
+
+        return True
 
     def longestCommonSubsequence(self, text1, text2):
         '''
@@ -3521,51 +4354,33 @@ class LeetCode_Medium:
         :param start: int
         :return: bool
         leetcode medium: 1306. Jump Game III
+        Input: arr = [3,0,2,1,2], start = 2
+        Output: false
+        Explanation: There is no way to reach at index 1 with value 0.
+        This solution is BFS
         '''
-        if start < 0 or start >= len(arr):
-            return False
+        jumps = [start]
 
-        if arr[start] == -1:
-            return False
+        while jumps:
+            current = jumps.pop(0)
 
-        if arr[start] == 0:
-            return True
+            if arr[current] == -1:
+                continue
 
-        temp = arr[start]
-
-        arr[start] = -1
-
-        if self.canReach(arr, start + temp):
-            return True
-
-        if self.canReach(arr, start - temp):
-            return True
-
-        return False
-
-    def canReach_bfs(self, arr, start):
-        '''
-        :param arr: List[int]
-        :param start: int
-        :return: bool
-        leetcode medium: 1306. Jump Game III
-        '''
-        _len_= len(arr)
-        seen = set()
-        queue = collections.deque()
-        queue.append(start)
-
-        while(queue):
-            idx = queue.popleft()
-
-            if arr[idx] == 0:
+            elif arr[current] == 0:
                 return True
 
-            seen.add(idx)
+            next_steps = current + arr[current], current - arr[current]
 
-            for var in (idx - arr[idx], idx + arr[idx]):
-                if (var not in seen) and (-1 < var < _len_):
-                    queue.append(var)
+            # Add next steps to the queue
+            if next_steps[0] < len(arr):
+                jumps.append(next_steps[0])
+
+            if next_steps[1] >= 0:
+                jumps.append(next_steps[1])
+
+            # Mark the current index as visited
+            arr[current] = -1
 
         return False
 
@@ -3665,6 +4480,70 @@ class LeetCode_Hard:
             stack.append(i)
         return area
 
+    def maximalRectangle(self, matrix):
+        '''
+        :param matrix: List[List[str]]
+        :return: int
+        leetcode Hard: 85. Maximal Rectangle
+        Input: matrix = [["1","0","1","0","0"],
+                         ["1","0","1","1","1"],
+                         ["1","1","1","1","1"],
+                         ["1","0","0","1","0"]]
+        Output: 6
+        '''
+        res, histRow = 0, ([0 for _ in matrix[0]]) if matrix else None
+
+        for rowNums in matrix:
+            stack = []
+
+            for c, num in enumerate(rowNums):
+                histRow[c] = (histRow[c] + 1) if num == '1' else 0
+
+            for i, n in enumerate(histRow + [0]):
+                while stack and histRow[stack[-1]] > n:
+                    h = histRow[stack.pop()]
+                    res = max(res, h * ((i - stack[-1] - 1) if stack else i))
+
+                stack.append(i)
+
+        return res
+
+    def findKthNumber(self, m: int, n: int, k: int) -> int:
+        '''
+        :param m: int
+        :param n: int
+        :param k: int
+        :return: int
+        leetcode Hard: 668. Kth Smallest Number in Multiplication Table
+        Input: m = 3, n = 3, k = 5
+        Output: 3
+        Explanation: The 5th smallest number is 3.
+        '''
+        if m > n:
+            m, n = n, m
+
+        def search(number):
+            ans = 0
+
+            for i in range(1, min(m, number) + 1):
+                ans += min(n, number // i)
+
+            return ans
+
+        left = 1
+        right = m * n
+
+        while (left < right):
+            mid = (left + right) // 2
+
+            if search(mid) < k:
+                left = mid + 1
+
+            else:
+                right = mid
+
+        return left
+
     def orderlyQueue(self, s, k):
         '''
         :param s: str
@@ -3689,6 +4568,7 @@ class LeetCode_Hard:
         '''
         :param grid: List[List[int]
         :return: int
+        leetcode Hard: 980. Unique Paths III
         '''
         m, n = len(grid), len(grid[0])
         start = None
@@ -3728,6 +4608,55 @@ class LeetCode_Hard:
             return result
 
         return backtrack(start[0], start[1])
+
+    def findNumOfValidWords(self, words, puzzles):
+        '''
+        :param words: List[str]
+        :param puzzles: List[str]
+        :return: List[int]
+        leetcode Hard: 1178. Number of Valid Words for Each Puzzle
+        Input: words = ["aaaa","asas","able","ability","actt","actor","access"],
+               puzzles = ["aboveyz","abrodyz","abslute","absoryz","actresz","gaswxyz"]
+        Output: [1,1,3,2,4,0]
+        '''
+        def getBitMask(word):
+            mask = 0
+
+            for c in word:
+                i = ord(c) - ord('a')
+                mask |= 1 << i
+
+            return mask
+
+        letterFrequencies = {}
+
+        for word in words:
+            mask = getBitMask(word)
+            letterFrequencies[mask] = letterFrequencies.get(mask, 0) + 1
+
+        solution = [0] * len(puzzles)
+
+        for i in range(len(puzzles)):
+            puzzle  = puzzles[i]
+            mask    = getBitMask(puzzle)
+            subMask = mask
+            total   = 0
+
+            firstBitIndex = ord(puzzle[0]) - ord('a')
+
+            while True:
+
+                if subMask >> firstBitIndex & 1:
+                    total += letterFrequencies.get(subMask, 0)
+
+                if subMask == 0:
+                    break
+
+                subMask = (subMask - 1) & mask
+
+            solution[i] = total
+
+        return solution
 
     def minJumps(self, arr):
         '''
@@ -3783,6 +4712,32 @@ class LeetCode_Hard:
 
         return -1
 
+    def countOrders(self, n: int) -> int:
+        '''
+        :param n: int
+        :return: int
+        leetcode hard: 1359. Count All Valid Pickup and Delivery Options
+
+        Input: n = 2
+        Output: 6
+        Explanation: All possible orders:
+        (P1,P2,D1,D2), (P1,P2,D2,D1), (P1,D1,P2,D2), (P2,P1,D1,D2), (P2,P1,D2,D1) and (P2,D2,P1,D1).
+        This is an invalid order (P1,D2,P2,D1) because Pickup 2 is after of Delivery 2.
+
+        Input: n = 3
+        Output: 90
+
+        solution : one pickup service have (2*1)-1 delivery service (1*3*5...2n-1)
+                    equal = n! (1*3*5...2n-1)
+        '''
+        count = 1
+
+        for i in range(2, n + 1):
+            count = count * (2 * i - 1) * i
+
+        return count % (10 ** 9 + 7)
+        # return 1 if n == 1 else (self.countOrders(n-1) * (2*n-1) * n) % (10**9+7)
+
 class DP:
     def searchInsert(self,nums ,target):
         '''
@@ -3815,35 +4770,22 @@ class DP:
 
         return dp[target]
 
-    def maxsunarry1(self,nums):
+    def maxsubarray(self,nums):
         '''
         :param nums: int
         :return: int
         leetcode easy: 53. Maximum Subarray
         '''
-        l = g = -100000000000
-        for num in nums:
-            l = max(num,l+num)
-            g = max(l,g)
-        return g
+        dp = [0] * len(nums)
+        dp[0] = nums[0]
 
-    def maxsubarray2(self,nums):
-        '''
-        :param nums: int
-        :return: int
-        leetcode easy: 53. Maximum Subarray
-        '''
-        l = len(nums)
-        if l == 0: return 0
-        res = now = 0
-        for i in range(l):
-            if now > 0:
-                now += nums[i]
-            else:
-                now = nums[i]
-            if now > res:
-                res = now
-        return res
+        for i in range(1, len(nums)):
+            # explanation: if len(nums) > 1 , compare between nums[i] with nums[i] + dp[i-1]
+            # because dp[i-1] is record previous step compare result
+
+            dp[i] = max(nums[i], nums[i] + dp[i - 1])
+
+        return max(dp)
 
     def permute(self, nums):
         '''
@@ -3859,23 +4801,6 @@ class DP:
                     new_L.append(perm[:i] + [n] + perm[i:])
                     L = new_L
         return L
-
-    def maxsubarray3(self,nums):
-        '''
-        :param nums: int
-        :return: int
-        leetcode easy: 53. Maximum Subarray
-        '''
-        sum = 0
-        ma = nums[0]
-        for i in range(len(nums)):
-            if (sum < 0):
-                sum = nums[i]
-            else:
-                sum += nums[i]
-
-            ma = max(ma, sum)
-        return ma
 
     def canJump1(self,A):
         '''
@@ -3915,7 +4840,7 @@ class DP:
                     dp[i] = min(dp[i],dp[j]+1)
         return dp[n-1]
 
-    def uniquePaths1(self,m,n):
+    def uniquePaths(self,m,n):
         '''
         :param m: int
         :param n: int
@@ -3924,31 +4849,11 @@ class DP:
         '''
         dp = [[1] * n for _ in range(m)]
 
-        for i in range(m):
-            for j in range(n):
-                if i == 0 or j == 0:
-                    continue
-
+        for i in range(1,m):
+            for j in range(1,n):
                 dp[i][j] = dp[i][j - 1] + dp[i - 1][j]
 
         return dp[m - 1][n - 1]
-
-    def uniquePaths2(self,m,n):
-        '''
-        :param m: int
-        :param n: int
-        :return: int
-        leetcode medium: 62. Unique Paths
-        '''
-        c = [0 for _ in range(m)]
-
-        for i in range(n):
-            for j in range(m):
-                if j == 0:
-                    c[j] = 1
-                else:
-                    c[j] = c[j] + c[j - 1]
-        return c[m - 1]
 
     def uniquePathsWithObstacles(self, obstacleGrid):
         '''
@@ -4000,11 +4905,7 @@ class DP:
         :return: int
         leetcode easy: 70. Climbing Stairs
         '''
-        if n == 1:
-            return 1
-        dp = [0] * (n+1)
-        dp[0] = 1
-        dp[1] = 1
+        dp = [1] * (n + 1)
 
         for i in range(2, n+1):
             dp[i] = dp[i-1] + dp[i-2]
@@ -4015,7 +4916,7 @@ class DP:
         '''
         :param n: int
         :return: int
-                leetcode easy: 70. Climbing Stairs
+        leetcode easy: 70. Climbing Stairs
         '''
         if n == 1:
             return 1
@@ -4050,6 +4951,59 @@ class DP:
 
         return dp[-1][-1]
 
+    def maximalRectangle(self, matrix):
+        '''
+        :param matrix: List[List[str]]
+        :return: int
+        leetcode Hard: 85. Maximal Rectangle
+        Input: matrix = [["1","0","1","0","0"],
+                         ["1","0","1","1","1"],
+                         ["1","1","1","1","1"],
+                         ["1","0","0","1","0"]]
+        Output: 6
+
+        DP: left[i]   = max(left[i],currentLeft)
+            right[i]  = min(right[i],currentRight)
+            height[i] = height[i]+1 if row[i] == '1' else 0
+        '''
+        if not matrix:
+            return 0
+
+        n = len(matrix[0])
+        left, right, height = [0] * n, [n] * n, [0] * n
+        res = 0
+
+        for row in matrix:
+            # calculate right
+            currentRight = n
+
+            for i in range(n - 1, -1, -1):
+                if row[i] == '1':
+                    right[i] = min(right[i], currentRight)
+
+                else:
+                    right[i] = n
+                    currentRight = i
+
+            currentLeft = 0
+
+            for i in range(n):
+                # calculate height
+                height[i] = height[i] + 1 if row[i] == '1' else 0
+
+                # calculate left
+                if row[i] == '1':
+                    left[i] = max(left[i], currentLeft)
+
+                else:
+                    left[i] = 0
+                    currentLeft = i + 1
+
+                # calculate Rectangle
+                res = max(res, height[i] * (right[i] - left[i]))
+
+        return res
+
     def numDecodings(self, s):
         '''
         :param s: str
@@ -4067,6 +5021,25 @@ class DP:
                 dp[i] += dp[i-2]
 
         return dp[-1]
+
+    def numTrees(self, n):
+        '''
+        :param n: int
+        :return: int
+        leetcode medium: 96. Unique Binary Search Trees
+        '''
+
+        if n == 0:
+            return 0
+
+        dp = [0] * (1 + n)
+        dp[0] = 1
+
+        for i in range(1, n + 1, 1):
+            for j in range(0, i):
+                dp[i] += dp[j] * dp[i - 1 - j]
+
+        return dp[n]
 
     def minimumTotal(self,triangle):
         '''
@@ -4119,7 +5092,7 @@ class DP:
 
         return dp[n]
 
-    def rob1(self, nums):
+    def rob(self, nums):
         '''
         Input: [2,7,9,3,1]
         Output: 12
@@ -4127,9 +5100,6 @@ class DP:
         :return: int
         leetcode medium: 198. House Robber
         '''
-        if len(nums) == 0:
-            return 0
-
         if len(nums) == 1:
             return nums[0]
 
@@ -4139,26 +5109,34 @@ class DP:
         rob[1] = max(nums[0], nums[1])
 
         for i in range(2, len(nums)):
-            rob[i] = max(nums[i] + rob[i - 2], rob[i - 1])
+            rob[i] = max(rob[i - 1] , nums[i] + rob[i - 2])
 
         return rob[-1]
 
-    def rob2(self, nums):
+    def maximalSquare(self, matrix):
         '''
-        Input: [2,7,9,3,1]
-        Output: 12
-        :param nums: List[int]
+        :param matrix: List[List[str]]
         :return: int
-        leetcode medium: 198. House Robber
+        leetcode medium: 221. Maximal Square
+
+        Input: matrix = [["1","0","1","0","0"],
+                         ["1","0","1","1","1"],
+                         ["1","1","1","1","1"],
+                         ["1","0","0","1","0"]]
+        Output: 4
         '''
-        rob1, rob2 = 0, 0
+        m = len(matrix)
+        n = len(matrix[0])
+        res = 0
+        dp = [[0] * n for _ in range(m)]
 
-        for n in nums:
-            temp = max(n + rob1, rob2)
-            rob1 = rob2
-            rob2 = temp
+        for i in range(m):
+            for j in range(n):
+                if matrix[i][j] == "1":
+                    dp[i][j] = 1 + min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1])
+                    res = max(res, dp[i][j])
 
-        return rob2
+        return res ** 2
 
     def numSquares(self,n):
         '''
@@ -4237,6 +5215,46 @@ class DP:
 
         return rs[amount]
 
+    def largestDivisibleSubset(self, nums):
+        '''
+        :param nums: List[int]
+        :return: List[int]
+        leetcode medium: 368. Largest Divisible Subset
+        Input: nums = [1,2,3]
+        Output: [1,2]
+        Explanation: [1,3] is also accepted.
+
+        Input: nums = [1,2,4,8]
+        Output: [1,2,4,8]
+        '''
+        if not nums:
+            return []
+
+        nums.sort()
+
+        dp        = [0]  * len(nums)
+        construct = [-1] * len(nums)
+        best      = -1
+        best_i    = -1
+
+        for i in range(len(nums)):
+            for j in range(i):
+                if nums[i] % nums[j] == 0 and dp[i] < dp[j]:
+                    construct[i], dp[i] = j, dp[j]
+
+            dp[i] += 1
+
+            if dp[i] > best:
+                best, best_i = dp[i], i
+
+        result = [nums[best_i]]
+
+        while (construct[best_i] > -1):
+            best_i = construct[best_i]
+            result.append(nums[best_i])
+
+        return result[::-1]
+
     def longestPalindrome(self, s):
         '''
         :param s: str
@@ -4263,22 +5281,51 @@ class DP:
 
         return s[start: end + 1]
 
-    def numberOfArithmeticSlices(self, A):
+    def numberOfArithmeticSlices(self, nums):
         '''
-        :param A: List[int]
+        :param nums: List[int]
         :return: int
         leetcode medium: 413. Arithmetic Slices
-        input: A = [1, 2, 3, 4]
+
+        input: nums = [1, 2, 3, 4]
         output: return: 3,
         for 3 arithmetic slices in A: [1, 2, 3], [2, 3, 4] and [1, 2, 3, 4] itself.
         '''
-        dp = [0] * len(A)
+        if len(nums) < 3:
+            return 0
 
-        for i in range(2, len(A)):
-            if A[i] - A[i - 1] == A[i - 1] - A[i - 2]:
+        dp = [0] * len(nums)
+
+        for i in range(2, len(nums)):
+            if nums[i] - nums[i - 1] == nums[i - 1] - nums[i - 2]:
                 dp[i] = dp[i - 1] + 1
 
         return sum(dp)
+
+    def canPartition(self, nums):
+        '''
+        :param nums: List[int]
+        :return: bool
+        leetcode medium: 416. Partition Equal Subset Sum
+
+        Input: nums = [1,5,11,5]
+        Output: true
+        Explanation: The array can be partitioned as [1, 5, 5] and [11].
+        '''
+        s = sum(nums)
+        target = s // 2                                 # sum of one subset will be half of total sum
+        if s & 1:                                       # if the sum is odd then subsets cannot be formed.
+            return False
+
+        dp = [False] * (target + 1)
+        dp[0] = True
+
+        for n in nums:
+            for i in range(target, -1, -1):             # check if i element can be formed using array
+                if i >= n:                              # either the i if already present in nums or
+                    dp[i] = dp[i] or dp[i - n]          # i-n can be formed from array
+                                                        # return the status of target index
+        return dp[target]                               # if it can be formed then it will be set to True else False
 
     def findMaxForm(self, strs, m, n):
         '''
@@ -4348,6 +5395,81 @@ class DP:
             dp[i] = dp[i - 1] + dp[i - 2]
 
         return dp[N]
+
+    def deleteAndEarn(self, nums):
+        '''
+        :param nums: List[int]
+        :return: int
+        leetcode easy: 740. Delete and Earn
+
+        Input: nums = [3,4,2]
+        Output: 6
+        Explanation: You can perform the following operations:
+        - Delete 4 to earn 4 points. Consequently, 3 is also deleted. nums = [2].
+        - Delete 2 to earn 2 points. nums = [].
+        You earn a total of 6 points.
+        '''
+        d = collections.Counter(nums)
+        m = max(nums)
+        dp = [0] * (m + 1)
+
+        for i in range(1, m + 1):
+            if i in d:
+                if i == 1:
+                    dp[i] = d[i] * i
+
+                else:
+                    dp[i] = max(dp[i - 1], dp[i - 2] + i * d[i])
+
+            else:
+                dp[i] = dp[i - 1]
+
+        return dp[-1]
+
+    def numTilings(self, n):
+        '''
+        :param n: int
+        :return: int
+        leetcode medium: 790. Domino and Tromino Tiling
+        '''
+        if n == 1:
+            return 1
+
+        mod = 10 ** 9 + 7
+        dp_full = [0 for _ in range(n)]
+        dp_incomp = [0 for _ in range(n)]
+
+        dp_full[0] = 1
+        dp_full[1] = 2
+        dp_incomp[1] = 2
+
+        for i in range(2, n):
+            dp_full[i] = dp_full[i - 2] + dp_full[i - 1] + dp_incomp[i - 1]
+            dp_incomp[i] = dp_full[i - 2] * 2 + dp_incomp[i - 1]
+
+        return dp_full[-1] % mod
+
+    def champagneTower(self, poured, query_row, query_glass):
+        '''
+        :param poured: int
+        :param query_row: int
+        :param query_glass: int
+        :return: float
+        leetcode medium: 799. Champagne Tower
+        '''
+        dp = [[0 for _ in range(x)] for x in range(1, query_row + 2)]
+
+        dp[0][0] = poured
+
+        for i in range(query_row):
+            for j in range(len(dp[i])):
+                temp = (dp[i][j] - 1) / 2.0
+
+                if temp > 0:
+                    dp[i + 1][j] += temp
+                    dp[i + 1][j + 1] += temp
+
+        return dp[query_row][query_glass] if dp[query_row][query_glass] <= 1 else 1
 
     def longestArithSeqLength(self, A):
         '''
@@ -4420,6 +5542,29 @@ class DP:
                     dp[i][j] = max(dp[i - 1][j], dp[i][j - 1])
 
         return dp[m - 1][n - 1]
+
+    def countOrders(self, n):
+        '''
+        :param n: int
+        :return: int
+        leetcode hard: 1359. Count All Valid Pickup and Delivery Options
+
+        Input: n = 2
+        Output: 6
+        Explanation: All possible orders:
+        (P1,P2,D1,D2), (P1,P2,D2,D1), (P1,D1,P2,D2), (P2,P1,D1,D2), (P2,P1,D2,D1) and (P2,D2,P1,D1).
+        This is an invalid order (P1,D2,P2,D1) because Pickup 2 is after of Delivery 2.
+
+        Input: n = 3
+        Output: 90
+        '''
+        dp = [0 for i in range(n + 1)]
+        dp[1] = 1
+
+        for i in range(2, len(dp)):
+            dp[i] = dp[i - 1] * i * (2 * i - 1) % (10 ** 9 + 7)
+
+        return dp[n]
 
     def maxProduct(self, nums):
         """
@@ -4838,6 +5983,55 @@ class DFS:
 
         return dfs(nums, k, 0, target)
 
+    def accountsMerge(self, accounts):
+        '''
+        :param accounts: List[List[str]]
+        :return: List[List[str]]
+        leetcode medium: 721. Accounts Merge
+        Input: accounts = [["John","johnsmith@mail.com","john_newyork@mail.com"],
+                           ["John","johnsmith@mail.com","john00@mail.com"],
+                           ["Mary","mary@mail.com"],
+                           ["John","johnnybravo@mail.com"]]
+
+        Output: [["John","john00@mail.com","john_newyork@mail.com","johnsmith@mail.com"],
+                 ["Mary","mary@mail.com"],
+                 ["John","johnnybravo@mail.com"]]
+        '''
+        graph = collections.defaultdict(set)
+
+        for acct in accounts:
+            center = acct[1]
+            for email in acct[2:]:
+                graph[center].add(email)
+                graph[email].add(center)
+
+        seen = set()
+
+        def dfs(email, acct):
+            stack = [email]
+            seen.add(email)
+
+            while stack:
+                cur = stack.pop()
+                acct.append(cur)
+                for nei in graph[cur]:
+                    if nei not in seen:
+                        seen.add(nei)
+                        stack.append(nei)
+
+        ans = []
+
+        for acct in accounts:
+            name = acct[0]
+            email = acct[1]
+
+            if email not in seen:
+                cur = []
+                dfs(email, cur)
+                ans.append([name] + sorted(cur))
+
+        return ans
+
     def letterCasePermutation(self, S):
         '''
         :param S: str
@@ -4887,11 +6081,46 @@ class DFS:
 
         return self.total
 
+    def canReach(self, arr, start):
+        '''
+        :param arr: List[int]
+        :param start: int
+        :return: bool
+        leetcode medium: 1306. Jump Game III
+        Input: arr = [4,2,3,0,3,1,2], start = 5
+        Output: true
+        Explanation:
+        All possible ways to reach at index 3 with value 0 are:
+        index 5 -> index 4 -> index 1 -> index 3
+        index 5 -> index 6 -> index 4 -> index 1 -> index 3
+        '''
+        if start < 0 or start >= len(arr):
+            return False
+
+        if arr[start] == -1:
+            return False
+
+        if arr[start] == 0:
+            return True
+
+        temp = arr[start]
+
+        # Mark the current index as visited
+        arr[start] = -1
+
+        if self.canReach(arr, start + temp):
+            return True
+
+        if self.canReach(arr, start - temp):
+            return True
+
+        return False
+
     def goodNodes(self, root):
         '''
         :param root: : TreeNode
         :return: int
-        1448. Count Good Nodes in Binary Tree
+        leetcode medium: 1448. Count Good Nodes in Binary Tree
         '''
         self.res = 0
 
@@ -4995,7 +6224,237 @@ class algorithm:
                     seen.add(w)
             print(vertex)
 
+    def how_manny_permutation(self,n,k):
+        '''
+        :param n int
+        :param k: int
+        :return: int
+
+        given n numbers then pick kth , how many permutation
+
+        ans = n! / (n-k)!
+        '''
+        total  = 1
+        diff   = 1
+
+        for i in range(1,n + 1):
+            total  *= i
+
+            if i <= n - k:
+                diff  *= i
+
+        return total // diff
+
+    def combination(self,n,k):
+        '''
+        :param nums: int
+        :param target: int
+        :return: list[list[int]]
+        ans = n! / (n-k)! (k!)
+        '''
+        total  = 1
+        diff   = 1
+        repeat = 1
+
+        for i in range(1,n + 1):
+            total  *= i
+
+            if i <= n - k:
+                diff  *= i
+
+            if i <= k:
+                repeat *= i
+
+        return total // (diff * repeat)
+
+class Amazon:
+    def fresh_promotion(self,code_list, shopping_cart):
+        '''
+        :param code_list: List[List[str]]
+        :param shopping_cart: List[str]
+        :return: int
+
+        Amazon is running a promotion in which customers receive prizes for purchasing a secret combination of fruits.
+        The combination will change each day, and the team running the promotion wants to use a code list to make it easy to change the combination.
+        The code list contains groups of fruits. Both the order of the groups within the code list and the order of the fruits within the groups matter.
+        However, between the groups of fruits, any number, and type of fruit is allowable. The term "anything" is used to allow for any type of fruit to appear in that location within the group.
+
+        Consider the following secret code list: [[apple, apple], [banana, anything, banana]]
+        Based on the above secret code list, a customer who made either of the following purchases would win the prize:
+        orange, apple, apple, banana, orange, banana
+        apple, apple, orange, orange, banana, apple, banana, banana
+
+        Write an algorithm to output 1 if the customer is a winner else output 0.
+
+        Input
+        The input to the function/method consists of two arguments:
+        codeList, a list of lists of strings representing the order and grouping of specific fruits that must be purchased in order to win the prize for the day.
+        shoppingCart, a list of strings representing the order in which a customer purchases fruit.
+
+        Output
+        Return an integer 1 if the customer is a winner else return 0.
+
+        Note
+        'anything' in the codeList represents that any fruit can be ordered in place of 'anything' in the group. 'anything' has to be something, it cannot be "nothing."
+        'anything' must represent one and only one fruit.
+        If secret code list is empty then it is assumed that the customer is a winner.
+
+        Example 1:
+
+        Input: codeList = [[apple, apple], [banana, anything, banana]] shoppingCart = [orange, apple, apple, banana, orange, banana]
+        Output: 1
+        Explanation:
+        codeList contains two groups - [apple, apple] and [banana, anything, banana].
+        The second group contains 'anything' so any fruit can be ordered in place of 'anything' in the shoppingCart.
+        The customer is a winner as the customer has added fruits in the order of fruits in the groups and the order of groups in the codeList is also maintained in the shoppingCart.
+
+        Example 2:
+
+        Input: codeList = [[apple, apple], [banana, anything, banana]]
+        shoppingCart = [banana, orange, banana, apple, apple]
+        Output: 0
+        Explanation:
+        The customer is not a winner as the customer has added the fruits in order of groups but group [banana, orange, banana] is not following the group [apple, apple] in the codeList.
+
+        Example 3:
+
+        Input: codeList = [[apple, apple], [banana, anything, banana]] shoppingCart = [apple, banana, apple, banana, orange, banana]
+        Output: 0
+        Explanation:
+        The customer is not a winner as the customer has added the fruits in an order which is not following the order of fruit names in the first group.
+
+        Example 4:
+
+        Input: codeList = [[apple, apple], [apple, apple, banana]] shoppingCart = [apple, apple, apple, banana]
+        Output: 0
+        Explanation:
+        The customer is not a winner as the first 2 fruits form group 1, all three fruits would form group 2, but can't because it would contain all fruits of group 1.
+        '''
+
+        cart_idx = 0
+        code_list_idx = 0
+
+        while code_list_idx in range(len(code_list)) and cart_idx < len(shopping_cart):
+            code = code_list[code_list_idx]
+            code_idx = 0
+
+            while code_idx < len(code) and cart_idx < len(shopping_cart):
+                if code[code_idx] == shopping_cart[cart_idx] or code[code_idx] == 'anything':
+                    code_idx += 1
+
+                else:
+                    code_idx = 0
+
+                cart_idx += 1
+
+            if code_idx == len(code):
+                code_list_idx += 1
+
+        if code_list_idx == len(code_list):
+            return 1
+
+        return 0
+
+    def aircraft(self,maxTravelDist, forwardRouteList, returnRouteList):
+        '''
+        :param maxTravelDist: int
+        :param forwardRouteList: List[List[int]]
+        :param returnRouteList: List[List[int]]
+        :return: List[List[int]]
+        test 1 :
+            maxTravelDist    = 10000
+            forwardRouteList = [[1, 3000], [2, 5000], [3, 7000], [4, 10000]]
+            returnRouteList  = [[1, 2000], [2, 3000], [3, 4000], [4, 5000]]
+
+            output : [[2,4],[3,2]]
+
+        test 2:
+            maxTravelDist    = 7000
+            forwardRouteList = [[1, 2000], [2, 4000], [3, 6000]]
+            returnRouteList  = [[1, 2000]]
+
+            output : [[2,1]]
+        '''
+        for i in range(len(forwardRouteList)):
+            for j in range(i + 1, len(forwardRouteList)):
+                if forwardRouteList[i][1] > forwardRouteList[j][1]:
+                    forwardRouteList[i], forwardRouteList[j] = forwardRouteList[j], forwardRouteList[i]
+
+        for i in range(len(returnRouteList)):
+            for j in range(i + 1, len(returnRouteList)):
+                if returnRouteList[i][1] > returnRouteList[j][1]:
+                    returnRouteList[i], returnRouteList[j] = returnRouteList[j], returnRouteList[i]
+
+        d = {}
+
+        for f in forwardRouteList:
+            for r in returnRouteList:
+                if f[1] + r[1] > maxTravelDist:
+                    continue
+
+                if f[1] + r[1] <= maxTravelDist:
+                    if f[1] + r[1] in d:
+                        d[f[1] + r[1]].append([f[0], r[0]])
+
+                    else:
+                        d[f[1] + r[1]] = [[f[0], r[0]]]
+
+        return d[max(d)]
+
+class Google:
+    def valid_parentheses(self,st):
+        '''
+        :param st: str
+        :return: bool
+        codewar
+        '''
+        cnt = 0
+        for char in st:
+            if char == '(': cnt += 1
+            if char == ')': cnt -= 1
+            if cnt < 0: return False
+        return True if cnt == 0 else False
+
+    def sumlist(self,nums,target):
+        '''
+        :param nums: List[int]
+        :param target: int
+        :return: List[int]
+        google question
+        '''
+        ans = [] ; tmp = []
+        for num in nums:
+            sub = target - num
+            if sub in nums:
+                tmp.append(sub)
+                tmp.append(num)
+            if len(tmp) != 0 and len(tmp) == 2:
+                tmp = sorted(tmp)
+                if tmp not in ans:
+                    ans.append(tmp)
+                    tmp = []
+        return ans
+
+    def vampire_number(self,x,y):
+        '''
+        :param x: int
+        :param y: int
+        :return: bool
+        '''
+        xy = x*y
+        if len(str(xy)) != len(str(x))+len(str(y)):
+            return False
+
+        xy_list = list(str(x))+(list(str(y)))
+
+        for i in xy_list:
+            if i not in str(xy):
+                return False
+            else:
+                if list(str(xy)).count(i) != xy_list.count(i):
+                    return False
+
+        return True
+
 if __name__ == '__main__':
-    bleonly = sys.argv[1]
-    if bleonly:
-        sys.exit(123)
+    pass

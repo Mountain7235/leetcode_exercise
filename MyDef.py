@@ -35,7 +35,6 @@ import importlib
 from leetcode import LeetCode_Easy as easy
 from leetcode import LeetCode_Medium as medium
 
-
 # region Set Looger
 '''
 logger = logging.getLogger(os.path.basename(__file__))
@@ -183,6 +182,20 @@ def reverseList(head):
 # endregion
 
 # region Base Function
+def gcd(a, b):
+    '''
+    :param a: int
+    :param b: int
+    :return: int
+    this function is greatest common divisor
+    equal
+    GCD = lambda a, b: GCD(b, a % b) if a % b else b
+    '''
+    if a % b:
+        return gcd(b, a % b)
+    else:
+        return b
+
 def leto(times):
     leto = []
     letodic = {}
@@ -261,9 +274,6 @@ def conver():
     string = 'abcd'
     ''.join([hex(ord(x))[2:] for x in string])  # '61626364'  ,String to Hex
 
-def Reverse(_torever):
-    return _torever[::-1]
-
 def average(_listNum):
     # using for loop
     n = 0
@@ -282,28 +292,6 @@ def average(_listNum):
     avg2 = total / n
     return avg1  # or avf2
 
-def basicLoop(_loopcount):
-    while _loopcount > 0:
-        # 迴圈工作區
-        print(_loopcount)
-        _loopcount -= 1 # 調整控制變數值
-
-    #for loop
-    for i in range(_loopcount, 0, -1): #range(第一個參數為起始值，第二個參數為結束值，第三個參數為遞增值)
-        print(i)
-
-def transferParameter():
-    #intValue = int(sys.argv[1])#如果要將變數搞成數字的話可以使用 int()來轉
-    print(sys.argv[0])          # *.py也算一個參數
-    print(sys.argv[1])
-    print(sys.argv[2])
-    print(sys.argv[3])
-    print("===============")
-    print(len(sys.argv))#參數一共有幾個
-    print("===============")
-    for x in sys.argv:
-        print(x)
-
 def foundSyspath():
     return sys.path[0]
 
@@ -320,18 +308,6 @@ def removeDuplicates(nums):
             s += 1
             nums[s] = nums[f]
     return s + 1
-
-def removeElement(nums, val):
-    '''
-    :param nums: list[int]
-    :param val: int
-    :return: int
-    '''
-    count = 0
-    for num in nums:
-        if num != val:
-            count += 1
-    return count
 
 def folder_compare(path_a, path_b, out_diff=None, out_a=None, out_b=None, ):
     alist, blist = [], []
@@ -455,29 +431,6 @@ def Fibonacci_2(num):
             x = tmp
         return y
 
-def guessnumber():
-    que = int(random.random() * 100) + 1
-    min = 1
-    max = 100
-    while 1:
-        ans = int(input('please input number {0} ~ {1}:'.format(min, max)))
-
-        if ans >= min and ans <= max:
-            if ans == que:
-                print('yes')
-                break
-
-            if ans > que:
-                max = ans
-                print('too big')
-
-            if ans < que:
-                min = ans
-                print('too small')
-
-        else:
-            print('out of range')
-
 def matrix_print(matrix):
     for i in range(len(matrix)):
         for j in range(len(matrix[i])):
@@ -596,24 +549,6 @@ def creat_new_excel():
     ws.title = 'mySheet'
     wb.save('test.xlsx')
 
-def cityTime(city):
-    if type(city) != str:
-        return 'input type not string'
-
-    city = city.title()
-
-    city_timezone = None
-
-    for country in pytz.country_timezones:
-        for tz in pytz.country_timezones(country):
-            if city in tz:
-                city_timezone = pytz.timezone(tz)
-
-    if not city_timezone:
-        return 'The {0} timezone not found ...'
-
-    return datetime.datetime.now(city_timezone)
-
 def dynamic_load_lib(libpath):
     if not os.path.exists(libpath):
         return f'{libpath} not exist , please make sure the lib path'
@@ -658,96 +593,59 @@ def error_messages_display():
         print(errMessage)
 # endregion
 
+def numMagicSquaresInside(g):
+    def isMagic(i, j):
+        s = "".join(str(g[i + x // 3][j + x % 3]) for x in [0, 1, 2, 5, 8, 7, 6, 3])
+        return g[i][j] % 2 == 0 and (s in "43816729" * 2 or s in "43816729"[::-1] * 2)
+
+    return sum(isMagic(i, j) for i in range(len(g) - 2) for j in range(len(g[0]) - 2) if g[i + 1][j + 1] == 5)
 
 if __name__ == '__main__':
     try:
         '''
-        text1 = "ezupkr"
-        text2 = "ubmrapg"
+        root = TreeNode(val   = 0,
+                        left  = TreeNode(val   = 1,
+                                         left  = TreeNode(val   = 3,
+                                                          left  = TreeNode(val = 6),
+                                                          right = TreeNode(val = 7)
+                                                          ),
+                                         right = TreeNode(val = 4)
+                                         ),
+                        right = TreeNode(val   = 2,
+                                         right = TreeNode(val   = 5,
+                                                          left  = TreeNode(val = 8),
+                                                          right = TreeNode(val = 9)
+                                                          )
+                                         )
+                        )
 
-        m, n = len(text1), len(text2)
-        dp = [[0 for _ in range(n)] for _ in range(m)]
+        res = []
+        q1 = [root]
+        q2 = []
 
-        if text1[0] == text2[0]:
-            dp[0][0] = 1
+        while q1:
+            node = q1.pop()
+            q2.append(node)
 
-        for j in range(1, n):
-            if text2[j] == text1[0]:
-                for k in range(j, n):
-                    dp[0][k] = 1
-                break
+            if node:
+                if node.left:
+                    q1.append(node.left)
 
-            else:
-                dp[0][j] = dp[0][0]
+                if node.right:
+                    q1.append(node.right)
 
-        for i in range(1, m):
-            if text1[i] == text2[0]:
-                for k in range(i, m):
-                    dp[k][0] = 1
-                break
-            else:
-                dp[i][0] = dp[0][0]
+        while q2:
+            node = q2.pop()
+            res.append(node.val)
 
-        for i in range(1, m):
-            for j in range(1, n):
-                if text1[i] == text2[j]:
-                    dp[i][j] = dp[i - 1][j - 1] + 1
-                else:
-                    dp[i][j] = max(dp[i - 1][j], dp[i][j - 1])
 
-        print(dp)
-        print(dp[m-1][n-1])
+        print(res)
+
+
+        d ={1:0}
+        d.removed
         '''
 
-        '''
-        def dfs(board, word, char, visited, i, j):
-            if char >= len(word):
-                return True
-
-            if i + 1 < len(board) and board[i + 1][j] == word[char] and not visited[i + 1][j]:
-                visited[i + 1][j] = 1
-
-                result = dfs(board, word, char + 1, visited, i + 1, j)
-
-                if result:
-                    return True
-
-                visited[i + 1][j] = 0
-
-            if j + 1 < len(board[0]) and board[i][j + 1] == word[char] and not visited[i][j + 1]:
-                visited[i][j + 1] = 1
-
-                result = dfs(board, word, char + 1, visited, i, j + 1)
-
-                if result:
-                    return True
-
-                visited[i][j + 1] = 0
-
-            if i - 1 >= 0 and board[i - 1][j] == word[char] and not visited[i - 1][j]:
-                visited[i - 1][j] = 1
-
-                result = dfs(board, word, char + 1, visited, i - 1, j)
-
-                if result:
-                    return True
-
-                visited[i - 1][j] = 0
-
-            if j - 1 >= 0 and board[i][j - 1] == word[char] and not visited[i][j - 1]:
-                visited[i][j - 1] = 1
-
-                result = dfs(board, word, char + 1, visited, i, j - 1)
-
-                if result:
-                    return True
-
-                visited[i][j - 1] = 0
-
-            return False
-        '''
-
-        print(2**31 / 65535)
 
 
     except:
