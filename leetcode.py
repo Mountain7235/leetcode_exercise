@@ -452,33 +452,54 @@ class LeetCode_Easy:
 
         return digits
 
-    def addBinary(self,a, b):
+    def addBinary(self, a, b):
         '''
         :param a: str
         :param b: str
         :return: str
         leetcode easy: 67. Add Binary
+
+        Input: a = "11", b = "1"
+        Output: "100"
+
+        Input: a = "1010", b = "1011"
+        Output: "10101"
         '''
-        count = 0
-        suma = 0
-        for i in a[::-1]:
-            suma = suma+(int(i)*(2**count))
-            count+=1
+        # return bin(int(a, 2) + int(b, 2))[2:]
 
-        count = 0
-        sumb = 0
-        for i in b[::-1]:
-            sumb = sumb+(int(i)*(2**count))
-            count+=1
+        '''
+        Funtion of half adder
 
-        total = suma + sumb
-        ans = ''
-        while total != 0:
-            ans = ans+str(total%2)
-            total//=2
+        x = int(a,2)
+        y = int(b,2)                # string transform to int
 
-        # str(bin(suma+sumb))[2:]
-        return ans
+        while y:                    # y represent carry bit
+            value = x ^ y           # x xor y to get sum  
+            carry = (x & y) << 1    # x and y to get carry , remember left shift 1 bit  
+
+            x = value
+            y = carry               
+
+        return bin(x)[2:]
+        '''
+
+        a = list(a)
+        b = list(b)
+
+        carry = 0
+        res = ''
+
+        while a or b or carry:
+            if a:
+                carry += int(a.pop())
+
+            if b:
+                carry += int(b.pop())
+
+            res += str(carry % 2)
+            carry //= 2
+
+        return res[::-1]
 
     def merge(self, nums1, m, nums2, n):
         """
@@ -647,17 +668,17 @@ class LeetCode_Easy:
         :return: List[List[int]]
         leetcode easy: 118. Pascal's Triangle
         '''
-        Pascal = [[] for _ in range(numRows)]
+        pascals = []
 
         for i in range(numRows):
-            for j in range(i + 1):
-                if 0 < j < i:
-                    Pascal[i].append(Pascal[i - 1][j - 1] + Pascal[i - 1][j])
+            row = [1] * (i + 1)
 
-                else:
-                    Pascal[i].append(1)
+            for j in range(1, i):
+                row[j] = pascals[i - 1][j - 1] + pascals[i - 1][j]
 
-        return Pascal
+            pascals.append(row)
+
+        return pascals
 
     def maxProfit(self, prices):
         '''
@@ -736,6 +757,49 @@ class LeetCode_Easy:
             n //= 26
 
         return dic[n] + ans
+
+    def majorityElement(self, nums):
+        '''
+        :param nums: List[int]
+        :return: int
+        leetcode easy: 169. Majority Element
+
+        Input: nums = [2,2,1,1,1,2,2]
+        Output: 2
+        '''
+        nums.sort()
+        return nums[len(nums)//2]
+
+    def titleToNumber(self, columnTitle):
+        '''
+        :param columnTitle: str
+        :return: int
+        leetcode easy: 171. Excel Sheet Column Number
+
+        Input: columnTitle = "A"
+        Output: 1
+
+        Input: columnTitle = "AB"
+        Output: 28
+
+        Input: columnTitle = "ZY"
+        Output: 701
+        '''
+        '''
+        res = 0
+        for c in columnTitle:
+            res *= 26
+            res += (ord(c) - ord('A') + 1)
+
+        return res
+        '''
+
+        total = 0
+
+        for c, v in enumerate(columnTitle[::-1]):
+            total +=  (ord(v) - 64) * (26**c)
+
+        return total
 
     def trailingZeroes1(self,n):
         '''
@@ -1142,15 +1206,28 @@ class LeetCode_Easy:
         :param n: int
         :return: bool
         leetcode Easy: 605. Can Place Flowers
-        '''
-        l = [0] + flowerbed + [0]
 
-        for i in range(1, len(l) - 1):
-            if sum(l[i - 1:i + 2]) == 0:
-                l[i] = 1
+        Input: flowerbed = [1,0,0,0,1], n = 1
+        Output: true
+
+        Input: flowerbed = [1,0,0,0,1], n = 2
+        Output: false
+        '''
+        if n == 0:
+            return True
+
+        flowerbed = [0] + flowerbed + [0]
+
+        for i in range(1, len(flowerbed) - 1):
+
+            if not (flowerbed[i] or flowerbed[i - 1] or flowerbed[i + 1]):
+                flowerbed[i] = 1
                 n -= 1
 
-        return n <= 0
+                if not n:
+                    break
+
+        return not n
 
     def findErrorNums(self, nums):
         '''
@@ -3309,6 +3386,30 @@ class LeetCode_Medium:
             cnt += 1
         return cnt
 
+    def removeKdigits(self, num, k):
+        '''
+        :param num: str
+        :param k: int
+        :return: str
+        leetcode medium: 402. Remove K Digits
+
+        Input: num = "1432219", k = 3
+        Output: "1219"
+        Explanation: Remove the three digits 4, 3, and 2 to form the new number 1219 which is the smallest.
+        '''
+        numStack = []
+
+        for digit in num:
+            while k and numStack and numStack[-1] > digit:
+                numStack.pop()
+                k -= 1
+
+            numStack.append(digit)
+
+        finalStack = numStack[:-k] if k else numStack
+
+        return "".join(finalStack).lstrip('0') or "0"
+
     def canPartition(self, nums):
         '''
         :param nums: List[int]
@@ -3394,6 +3495,47 @@ class LeetCode_Medium:
             root.right = self.deleteNode(root.right, minNode.val)
 
         return root
+
+    def findMinArrowShots(self, points):
+        '''
+        :param points: List[List[int]]
+        :return: int
+        leetcode medium: 452. Minimum Number of Arrows to Burst Balloons
+
+        Input: points = [[10,16],[2,8],[1,6],[7,12]]
+        Output: 2
+        Explanation: The balloons can be burst by 2 arrows:
+                      - Shoot an arrow at x = 6, bursting the balloons [2,8] and [1,6].
+                      - Shoot an arrow at x = 11, bursting the balloons [10,16] and [7,12].
+        '''
+
+        '''
+        sortedPoints = sorted(points, key= lambda x:x[1])
+        overlapped = 0
+        tail = sortedPoints[0][1]
+
+        for i in sortedPoints[1:]:
+            if i[0] <= tail:
+                overlapped += 1
+            else:
+                tail = i[1]
+
+        return len(sortedPoints) - overlapped
+        '''
+
+        points.sort()
+        right = -float("inf")
+        out = 0
+
+        for point in points:
+            if point[0] <= right:
+                if point[1] < right:
+                    right = point[1]
+            else:
+                right = point[1]
+                out += 1
+
+        return out
 
     def magicalString(self, n):
         '''
