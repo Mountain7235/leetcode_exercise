@@ -1732,6 +1732,7 @@ class LeetCode_Easy:
         :param low:  int
         :param high: int
         :return: int
+
         leetcode easy: 1523. Count Odd Numbers in an Interval Range
         '''
         if low % 2 == 0:
@@ -1763,6 +1764,7 @@ class LeetCode_Easy:
         '''
         :param mat: List[List[int]]
         :return: int
+
         leetcode easy: 1572. Matrix Diagonal Sum
         '''
         sum = 0
@@ -1778,7 +1780,9 @@ class LeetCode_Easy:
         :param arr: List[int]
         :param pieces: List[List[int]]
         :return: bool
+
         leetcode easy: 1640. Check Array Formation Through Concatenation
+
         Input: arr = [49,18,16], pieces = [[16,18,49]] ,Output: false
         Input: arr = [91,4,64,78], pieces = [[78],[4,64],[91]], Output: true
         '''
@@ -1792,6 +1796,49 @@ class LeetCode_Easy:
                 ans += mapping[num]
 
         return ans == arr
+
+    def findRotation(self, mat, target):
+        '''
+        :param mat: List[List[int]]
+        :param target: List[List[int]]
+        :return: bool
+
+        leetcode easy: 1886. Determine Whether Matrix Can Be Obtained By Rotation
+
+        Input: mat = [[0,0,0],[0,1,0],[1,1,1]], target = [[1,1,1],[0,1,0],[0,0,0]]
+        Output: true
+        Explanation: We can rotate mat 90 degrees clockwise two times to make mat equal target.
+        '''
+
+        '''
+        for _ in range(4): 
+            if mat == target: 
+                return True
+            mat = [list(x)[::-1] for x in zip(*mat)]
+        return False 
+        '''
+
+        if mat == target:
+            return True
+
+        count = 3
+
+        while count != 0:
+            l = len(mat)
+
+            for i in range(l):
+                for j in range(i + 1, l):
+                    if i != j:
+                        mat[i][j], mat[j][i] = mat[j][i], mat[i][j]
+
+                mat[i] = mat[i][::-1]
+
+            if mat == target:
+                return True
+
+            count -= 1
+
+        return False
 
     def countEven(self, num):
         '''
