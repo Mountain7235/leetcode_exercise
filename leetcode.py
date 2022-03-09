@@ -1840,6 +1840,48 @@ class LeetCode_Easy:
 
         return False
 
+    def validPath(self, n, edges, source, destination):
+        '''
+        :param n: int
+        :param edges: List[List[int]]
+        :param source: int
+        :param destination: int
+        :return: bool
+
+        leetcode easy: 1971. Find if Path Exists in Graph
+
+        Input: n = 3, edges = [[0,1],[1,2],[2,0]], source = 0, destination = 2
+        Output: true
+        Explanation: There are two paths from vertex 0 to vertex 2:
+        - 0 → 1 → 2
+        - 0 → 2
+        '''
+        if source == destination:
+            return True
+
+        graph = [[] for i in range(n)]
+
+        for s, d in edges:
+            graph[s].append(d)
+            graph[d].append(s)
+
+        visited = [False for _ in range(n)]
+
+        stack = [source]
+
+        while stack:
+            key = stack.pop(0)
+            visited[key] = True
+
+            if destination in graph[key]:
+                return True
+
+            for vertex in graph[key]:
+                if not visited[vertex]:
+                    stack.append(vertex)
+
+        return False
+
     def countEven(self, num):
         '''
         :param num: int
