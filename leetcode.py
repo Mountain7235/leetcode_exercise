@@ -5,6 +5,8 @@ import traceback
 import bisect
 
 # link list
+from typing import List, Any
+
 class ListNode:
     def __init__(self, val):
         self.val = val
@@ -2455,7 +2457,12 @@ class LeetCode_Medium:
         '''
         :param matrix: List[List[int]]
         :return: List[int]
+
         leetcode medium: 54. Spiral Matrix
+
+        Input: matrix = [[1,2,3],[4,5,6],[7,8,9]]
+        Output: [1,2,3,6,9,8,7,4,5]
+        '''
         '''
         spiral_path = []
 
@@ -2467,6 +2474,36 @@ class LeetCode_Medium:
             matrix = [*zip(*matrix)][::-1]
 
         return spiral_path
+        '''
+        m = len(matrix)
+        n = len(matrix[0])
+
+        left, right = 0, n - 1
+        top, bottom = 0, m - 1
+        ans = []
+
+        while left <= right and top <= bottom:
+
+            for i in range(left, right + 1):
+                ans.append(matrix[top][i])
+            top += 1
+
+            for i in range(top, bottom + 1):
+                ans.append(matrix[i][right])
+            right -= 1
+
+            if left > right or top > bottom:
+                break
+
+            for i in range(right, left - 1, -1):
+                ans.append(matrix[bottom][i])
+            bottom -= 1
+
+            for i in range(bottom, top - 1, -1):
+                ans.append(matrix[i][left])
+            left += 1
+
+        return ans
 
     def canJump(self, nums):
         '''
