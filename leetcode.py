@@ -1882,6 +1882,36 @@ class LeetCode_Easy:
 
         return False
 
+    def findGCD(self, nums):
+        '''
+        :param nums: List[int]
+        :return: int
+
+        leetcode easy: 1971. Find if Path Exists in Graph
+
+        Input: nums = [2,5,6,9,10]
+        Output: 2
+        Explanation:
+        The smallest number in nums is 2.
+        The largest number in nums is 10.
+        The greatest common divisor of 2 and 10 is 2.
+        '''
+        '''
+        small = min(nums)
+        large = max(nums)
+        
+        for i in range(small, 0, -1):
+            if small % i == 0 and large % i == 0:
+                return i
+        '''
+        min_num = min(nums)
+        max_num = max(nums)
+
+        while min_num:
+            min_num, max_num = max_num % min_num, min_num
+
+        return max_num
+
     def countEven(self, num):
         '''
         :param num: int
