@@ -3061,6 +3061,7 @@ class LeetCode_Medium:
         """
         # This solution is use -k % len(nums) (if k > len(nums) to reorganize nums self
         # nums[:] = nums[-k % len(nums):] + nums[:-k % len(nums)]
+        # -k or len(num) - k
 
         while k:
             nums.insert(0,nums.pop())
