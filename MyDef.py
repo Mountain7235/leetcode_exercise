@@ -457,7 +457,26 @@ def matrix_reverse(matrix):
 
     return new_matrix
 
-def matrix_rotate90(matrix):
+def matrix_rotate_180_degree(matrix):
+    ''' rotate in place'''
+    head = 0
+    tail = len(matrix) - 1
+
+    while head <= tail:
+        if head == tail:
+            matrix[head] = matrix[head][::-1]
+
+        else:
+            matrix[head] = matrix[head][::-1]
+            matrix[tail] = matrix[tail][::-1]
+            matrix[head], matrix[tail] = matrix[tail], matrix[head]
+
+        head += 1
+        tail -= 1
+
+        return matrix
+
+def matrix_rotate_left_90_degree(matrix,left = None):
     '''
     matrix = [[ 1, 2, 3, 4, 5],
               [ 6, 7, 8, 9,10],
@@ -469,22 +488,18 @@ def matrix_rotate90(matrix):
               [4,5,6],
               [7,9,8]]
     '''
-    length = len(matrix)
-    for x in range(len(matrix) // 2):
-        for y in range(x, length - x - 1):
-            temp = matrix[x][y]
+    l = len(matrix)
 
-            # move values from right to top
-            matrix[x][y] = matrix[y][length - 1 - x]
+    if left :
+        for i in range(len(matrix)):
+            matrix[i] = matrix[i][::-1]
 
-            # move values from bottom to right
-            matrix[y][length - 1 - x] = matrix[length - 1 - x][length - 1 - y]
+    for i in range(l):
+        for j in range(i + 1, l):
+            matrix[i][j], matrix[j][i] = matrix[j][i], matrix[i][j]
 
-            # move values from left to bottom
-            matrix[length - 1 - x][length - 1 - y] = matrix[length - 1 - y][x]
-
-            # assign temp to left
-            matrix[length - 1 - y][x] = temp
+        if not left:
+            matrix[i] = matrix[i][::-1]
 
     return matrix
 
@@ -645,8 +660,6 @@ if __name__ == '__main__':
         d ={1:0}
         d.removed
         '''
-
-
 
     except:
         error_messages_display()
