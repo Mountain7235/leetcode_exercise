@@ -661,5 +661,40 @@ if __name__ == '__main__':
         d.removed
         '''
 
+        n = 3
+
+        spiral = [[0 for i in range(n)] for _ in range(n)]
+
+        left, right = 0, n - 1
+        top, bottom = 0, n - 1
+
+        count = 1
+        while left <= right and top <= bottom:
+            for i in range(left, right + 1):
+                spiral[top][i] += count
+                count += 1
+
+            top += 1
+
+            for i in range(top, bottom + 1):
+                spiral[i][right] += count
+                count += 1
+
+            right -= 1
+
+            for i in range(right, left - 1, -1):
+                spiral[bottom][i] += count
+                count += 1
+
+            bottom -= 1
+
+            for i in range(bottom, top - 1, -1):
+                spiral[i][left] += count
+                count += 1
+
+            left += 1
+
+        print(spiral)
+
     except:
         error_messages_display()

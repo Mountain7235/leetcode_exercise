@@ -2611,15 +2611,39 @@ class LeetCode_Medium:
         :return: List[List[int]]
         leetcode medium: 59. Spiral Matrix II
         '''
-        def spiral(start, i, j):
-            if i == 1 and j == 1:
-                return [[start]]
+        spiral = [[0 for i in range(n)] for _ in range(n)]
 
-            next_spiral = spiral(start + i, j - 1, i)
+        left, right = 0, n - 1
+        top, bottom = 0, n - 1
 
-            return [list(range(start, start + i))] + [list(a) for a in zip(*next_spiral[::-1])]
+        count = 1
 
-        return spiral(1, n, n)
+        while left <= right and top <= bottom:
+            for i in range(left, right + 1):
+                spiral[top][i] += count
+                count += 1
+
+            top += 1
+
+            for i in range(top, bottom + 1):
+                spiral[i][right] += count
+                count += 1
+
+            right -= 1
+
+            for i in range(right, left - 1, -1):
+                spiral[bottom][i] += count
+                count += 1
+
+            bottom -= 1
+
+            for i in range(bottom, top - 1, -1):
+                spiral[i][left] += count
+                count += 1
+
+            left += 1
+
+        return spiral
 
     def rotateRight(self, head, k):
         '''
@@ -2650,6 +2674,37 @@ class LeetCode_Medium:
             prev.next = None
 
         return head
+
+    def simplifyPath(self, path):
+        '''
+        :param path: str
+        :return: str
+
+        leetcode medium: 71. Simplify Path
+
+        Input: path = "/home/"
+        Output: "/home"
+
+        Input: path = "/../"
+        Output: "/"
+
+        Input: path = "/home//foo/"
+        Output: "/home/foo"
+        '''
+        stack = []
+
+        for name in path.split('/'):
+            if not name:
+                continue
+
+            if name == '..':
+                if stack:
+                    stack.pop()
+
+            elif name != '.':
+                stack.append(name)
+
+        return '/'+'/'.join(stack)
 
     def setZeroes(self, matrix):
         '''
