@@ -4684,6 +4684,38 @@ class LeetCode_Medium:
 
         return dp[m - 1][n - 1]
 
+    def minRemoveToMakeValid(self, s: str) -> str:
+        '''
+        :param s: str
+        :return: str
+        leetcode medium: 1249. Minimum Remove to Make Valid Parentheses
+
+        Input: s = "lee(t(c)o)de)"
+        Output: "lee(t(c)o)de"
+        Explanation: "lee(t(co)de)" , "lee(t(c)ode)" would also be accepted.
+
+        Input: s = "))(("
+        Output: ""
+        Explanation: An empty string is also valid.
+        '''
+        s = list(s)
+        stack = []
+
+        for i, c in enumerate(s):
+            if c == "(":
+                stack.append(i)
+
+            elif c == ")":
+                if not stack:
+                    s[i] = ""
+                else:
+                    stack.pop()
+        if stack:
+            for i in stack:
+                s[i] = ''
+
+        return ''.join(s)
+
     def smallestDivisor(self, nums, threshold):
         '''
         :param nums: List[int]
