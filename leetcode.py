@@ -6873,4 +6873,20 @@ class Google:
         return True
 
 if __name__ == '__main__':
-    pass
+    # good youtuber careference https://www.youtube.com/c/CSDojo/featured
+
+    easy_list   = [function for function in dir(LeetCode_Easy) if function.startswith('__') is False]
+    medium_list = [function for function in dir(LeetCode_Medium) if function.startswith('__') is False]
+    hard_list   = [function for function in dir(LeetCode_Hard) if function.startswith('__') is False]
+
+    print(f'{"-"*10} leetcode easy level {"-"*10}')
+    for easy in easy_list:
+        print(easy)
+
+    print(f'\n{"-"*10} leetcode medium level {"-"*10}')
+    for medium in medium_list:
+        print(medium)
+
+    print(f'\n{"-"*10} leetcode hard level {"-"*10}')
+    for hard in hard_list:
+        print(hard)
