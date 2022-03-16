@@ -4,6 +4,8 @@ import sys
 import time
 import enum
 import ctypes
+import tkinter.filedialog
+
 import serial
 import random
 import logging
@@ -281,33 +283,24 @@ def average(_listNum):
     for x in _listNum:
         n += 1
         total += x
+
     avg1 = total / n
+
     # using while loop
     n = len(_listNum)
     i = 0
     total = 0
+
     while i < 5:
         total += _listNum[i]
         i += 1
+
     avg2 = total / n
+
     return avg1  # or avf2
 
 def foundSyspath():
     return sys.path[0]
-
-def removeDuplicates(nums):
-    '''
-    :param nums: list[int]
-    :return: int
-    '''
-    if len(nums) <= 1:
-        return len(nums)
-    s = 0
-    for f in range(1, len(nums)):
-        if nums[s] != nums[f]:
-            s += 1
-            nums[s] = nums[f]
-    return s + 1
 
 def folder_compare(path_a, path_b, out_diff=None, out_a=None, out_b=None, ):
     alist, blist = [], []
@@ -608,13 +601,6 @@ def error_messages_display():
         print(errMessage)
 # endregion
 
-def numMagicSquaresInside(g):
-    def isMagic(i, j):
-        s = "".join(str(g[i + x // 3][j + x % 3]) for x in [0, 1, 2, 5, 8, 7, 6, 3])
-        return g[i][j] % 2 == 0 and (s in "43816729" * 2 or s in "43816729"[::-1] * 2)
-
-    return sum(isMagic(i, j) for i in range(len(g) - 2) for j in range(len(g[0]) - 2) if g[i + 1][j + 1] == 5)
-
 if __name__ == '__main__':
     try:
         '''
@@ -660,41 +646,9 @@ if __name__ == '__main__':
         d ={1:0}
         d.removed
         '''
+        def greeter(name):
+            return f'Hi ,{name}'
 
-        n = 3
-
-        spiral = [[0 for i in range(n)] for _ in range(n)]
-
-        left, right = 0, n - 1
-        top, bottom = 0, n - 1
-
-        count = 1
-        while left <= right and top <= bottom:
-            for i in range(left, right + 1):
-                spiral[top][i] += count
-                count += 1
-
-            top += 1
-
-            for i in range(top, bottom + 1):
-                spiral[i][right] += count
-                count += 1
-
-            right -= 1
-
-            for i in range(right, left - 1, -1):
-                spiral[bottom][i] += count
-                count += 1
-
-            bottom -= 1
-
-            for i in range(bottom, top - 1, -1):
-                spiral[i][left] += count
-                count += 1
-
-            left += 1
-
-        print(spiral)
-
+        print(greeter('mountain'))
     except:
         error_messages_display()

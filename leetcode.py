@@ -4442,6 +4442,33 @@ class LeetCode_Medium:
             if K == 0 and S[i - 1].isalpha():
                 return S[i - 1]
 
+    def validateStackSequences(self, pushed, popped):
+        '''
+        :param pushed: List[int]
+        :param popped: List[int]
+        :return: bool
+
+        leetcode medium: 946. Validate Stack Sequences
+        Input: pushed = [1,2,3,4,5], popped = [4,5,3,2,1]
+        Output: true
+        Explanation: We might do the following sequence:
+        push(1), push(2), push(3), push(4),
+        pop() -> 4,
+        push(5),
+        pop() -> 5, pop() -> 3, pop() -> 2, pop() -> 1
+        '''
+        stack = []
+        i = 0
+
+        for num in pushed:
+            stack.append(num)
+
+            while stack and i < len(popped) and stack[-1] == popped[i]:
+                stack.pop()
+                i += 1
+
+        return stack == []
+
     def brokenCalc(self, X, Y):
         '''
         :param X: int
