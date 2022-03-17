@@ -1690,6 +1690,31 @@ class LeetCode_Easy:
 
         return False
 
+    def smallerNumbersThanCurrent(self, nums):
+        '''
+        :param nums: List[int]
+        :return: List[int]
+        leetcode easy: 1365. How Many Numbers Are Smaller Than the Current Number
+        Input: nums = [8,1,2,2,3]
+        Output: [4,0,1,1,3]
+        '''
+        n = sorted(nums)
+        dic = {}
+
+        for i in range(len(n)):
+            if n[i] in dic:
+                dic[n[i]][1] += 1
+
+            else:
+                dic[n[i]] = [i, 1]
+
+        res = []
+
+        for i in nums:
+            res.append(dic[i][0])
+
+        return res
+
     def luckyNumbers(self, matrix):
         '''
         :param matrix: List[List[int]]
