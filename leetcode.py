@@ -1943,6 +1943,35 @@ class LeetCode_Easy:
 
         return result
 
+    def sortEvenOdd(self, nums):
+        '''
+        :param nums: List[int]
+        :return: List[int]
+
+        leetcode easy: 2164. Sort Even and Odd Indices Independently
+        '''
+        '''
+        # short solution
+        nums[::2], nums[1::2] = sorted(nums[::2]), sorted(nums[1::2], reverse=True)
+        return nums
+        '''
+        if len(nums) == 1:
+            return nums
+
+        even = sorted([nums[i] for i in range(len(nums)) if i % 2 == 0])
+        odd = sorted([nums[i] for i in range(len(nums)) if i % 2 == 1])
+
+        res = []
+
+        while even or odd:
+            if even:
+                res.append(even.pop(0))
+
+            if odd:
+                res.append(odd.pop())
+
+        return res
+
     def countEven(self, num):
         '''
         :param num: int
@@ -4421,6 +4450,33 @@ class LeetCode_Medium:
                     path.append(v)
 
         return len(path) == len(rooms)
+
+    def scoreOfParentheses(self, s):
+        '''
+        :param s: str
+        :return: int
+        leetcode medium: 856. Score of Parentheses
+        Input: s = "(())"
+        Output: 2
+        Input: s = "()()"
+        Output: 2
+        '''
+        stack = []
+
+        for c in s:
+            if c == '(':
+                stack.append(c)
+
+            else:
+                evalsum = 0
+
+                while stack[-1] != '(':
+                    evalsum += stack.pop()
+
+                stack.pop()
+                stack.append(2 * evalsum if evalsum else 1)
+
+        return sum(stack)
 
     def decodeAtIndex(self, S, K):
         '''

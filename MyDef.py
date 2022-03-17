@@ -646,9 +646,13 @@ if __name__ == '__main__':
         d ={1:0}
         d.removed
         '''
-        def greeter(name):
-            return f'Hi ,{name}'
 
-        print(greeter('mountain'))
+        nums = [4,1,2,3]
+
+        print(nums[1::2])
+        nums[::2] = sorted(nums[::2])
+        print(nums)
+        nums[1::2] = sorted(nums[::2])[::-1]
+        print(nums)
     except:
         error_messages_display()
