@@ -3500,6 +3500,27 @@ class LeetCode_Medium:
 
         return max(dp[-1])
 
+    def removeDuplicateLetters(self, s):
+        '''
+        :param s: str
+        :return: str
+        leetcode medium: 316. Remove Duplicate Letters
+        Input: s = "bcabc"
+        Output: "abc
+        '''
+        stack = []
+
+        for i in range(len(s)):
+            if s[i] in stack:
+                continue
+
+            while stack and s[i] < stack[-1] and stack[-1] in s[i + 1:]:
+                stack.pop()
+
+            stack.append(s[i])
+
+        return "".join(stack)
+
     def oddEvenList(self, head):
         '''
         :param head: : Optional[ListNode]
@@ -3646,20 +3667,25 @@ class LeetCode_Medium:
         curnum = 0
         curstring = ''
         stack = []
+
         for char in s:
             if char == '[':
                 stack.append(curstring)
                 stack.append(curnum)
                 curstring = ''
                 curnum = 0
+
             elif char == ']':
                 prenum = stack.pop()
                 prestring = stack.pop()
                 curstring = prestring + prenum * curstring
+
             elif char.isdigit():
                 curnum = curnum * 10 + int(char)
+
             else:
                 curstring += char
+
         return curstring
 
     def integerReplacement(self, n):
@@ -6982,6 +7008,7 @@ class Google:
 
 if __name__ == '__main__':
     # good youtuber careference https://www.youtube.com/c/CSDojo/featured
+    # stack solution [316,394,946]
 
     easy_list   = [function for function in dir(LeetCode_Easy) if function.startswith('__') is False]
     medium_list = [function for function in dir(LeetCode_Medium) if function.startswith('__') is False]
