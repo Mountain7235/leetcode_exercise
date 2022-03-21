@@ -1,20 +1,25 @@
 import os
-import re
 import sys
+import random
+import logging
+import unittest
+import traceback
+import importlib
+
+# region Non using module
+'''
+import re
 import time
 import enum
 import ctypes
 import tkinter.filedialog
-
 import serial
-import random
-import logging
 import platform
 import getpass
 import subprocess
 import urllib.request
 import requests
-# import unittest
+
 import shutil
 import json
 import glob
@@ -31,11 +36,9 @@ import multiprocessing as mp
 import datetime
 import pytz
 import arrow
-import traceback
 import itertools
-import importlib
-from leetcode import LeetCode_Easy as easy
-from leetcode import LeetCode_Medium as medium
+'''
+# endregion
 
 # region Set Looger
 '''
@@ -97,79 +100,6 @@ def link_list(nums):
         head = head.next
 
     return link
-
-class magic_square:
-    def sub_square(self, grid):
-        matrix = []
-        '''
-        for x in range(len(grid) - 2):
-            for y in range(len(grid[0]) - 2):
-                sub_matrix = []
-                tempmatrix.append(grid[x][y:y + 3])
-                tempmatrix.append(grid[x + 1][y: y + 3])
-                tempmatrix.append(grid[x + 2][y: y + 3])
-                matrix.append(sub_matrix)
-        '''
-
-        for row in range(len(grid) - 2): # -2 : mean is want n*n sub matrix range(len(grid) - (n-1))
-            for col in range(len(grid[0]) - 2): # -2 : mean is want n*n sub matrix range(len(grid) - (n-1))
-                # i and j mean is want n*n sub matrix range(n)
-                sub_matrix = [[grid[row + i][col + j] for j in range(3)] for i in range(3)]
-                matrix.append(sub_matrix)
-
-        return matrix
-
-    def is_magic_square(self, matrix):
-        '''
-        #----------检查条件1-9
-        digit = 0 for i in range(0, 10)]
-
-        for row in ma:
-            for d in row:
-                if d > 9:
-                    return False
-                digit[d] = 0
-
-        for i in range(1, 10):
-            if digit[i] != 0:
-                return False
-
-        #----检查每一行
-        s = sum(ma[0])
-
-        for i in range(1, 3):
-            if sum(ma[i]) != s:
-                return False
-
-        #---检查对角线
-        sdia = 0
-        for i in range(0, 3):
-            sdia +=ma[i][i]
-        if sdia != s:
-            return False
-
-        sdia -= ma[2][0] + ma[1][1] + ma[0][2]
-        if sdia != 0:
-            return False
-
-        #---检查每一列
-        for j in range(0, 3):
-            sc = 0
-            for i in range(0,3):
-                sc += ma[i][j]
-            if sc != s:
-                return False
-
-        return True
-        '''
-
-        is_number_right = all(1 <= matrix[i][j] <= 9 for i in range(3) for j in range(3)) # i and j mean is want n*n sub matrix range(n)
-        is_row_right = all(sum(row) == 15 for row in matrix) # == 15 mean is magic square sum() = n(n^2+1)/2
-        is_col_right = all(sum(col) == 15 for col in [[matrix[i][j] for i in range(3)] for j in range(3)]) # i and j mean is want n*n sub matrix range(n)
-        is_diagonal_right = matrix[1][1] == 5 and matrix[0][0] + matrix[-1][-1] == 10 and matrix[0][-1] + \
-                            matrix[-1][0] == 10 # 5 is in matrix central and sum corner == 10
-        is_repeat_right = len(set(matrix[i][j] for i in range(3) for j in range(3))) == 9  # i and j mean is want n*n sub matrix range(n)
-        return is_number_right and is_row_right and is_col_right and is_diagonal_right and is_repeat_right
 
 def reverseList(head):
     prev = None
@@ -602,57 +532,46 @@ def error_messages_display():
 # endregion
 
 if __name__ == '__main__':
-    try:
-        '''
-        root = TreeNode(val   = 0,
-                        left  = TreeNode(val   = 1,
-                                         left  = TreeNode(val   = 3,
-                                                          left  = TreeNode(val = 6),
-                                                          right = TreeNode(val = 7)
-                                                          ),
-                                         right = TreeNode(val = 4)
-                                         ),
-                        right = TreeNode(val   = 2,
-                                         right = TreeNode(val   = 5,
-                                                          left  = TreeNode(val = 8),
-                                                          right = TreeNode(val = 9)
-                                                          )
-                                         )
-                        )
+    '''
+    root = TreeNode(val   = 0,
+                    left  = TreeNode(val   = 1,
+                                     left  = TreeNode(val   = 3,
+                                                      left  = TreeNode(val = 6),
+                                                      right = TreeNode(val = 7)
+                                                      ),
+                                     right = TreeNode(val = 4)
+                                     ),
+                    right = TreeNode(val   = 2,
+                                     right = TreeNode(val   = 5,
+                                                      left  = TreeNode(val = 8),
+                                                      right = TreeNode(val = 9)
+                                                      )
+                                     )
+                    )
 
-        res = []
-        q1 = [root]
-        q2 = []
+    res = []
+    q1 = [root]
+    q2 = []
 
-        while q1:
-            node = q1.pop()
-            q2.append(node)
+    while q1:
+        node = q1.pop()
+        q2.append(node)
 
-            if node:
-                if node.left:
-                    q1.append(node.left)
+        if node:
+            if node.left:
+                q1.append(node.left)
 
-                if node.right:
-                    q1.append(node.right)
+            if node.right:
+                q1.append(node.right)
 
-        while q2:
-            node = q2.pop()
-            res.append(node.val)
-
-
-        print(res)
+    while q2:
+        node = q2.pop()
+        res.append(node.val)
 
 
-        d ={1:0}
-        d.removed
-        '''
+    print(res)
 
-        nums = [4,1,2,3]
 
-        print(nums[1::2])
-        nums[::2] = sorted(nums[::2])
-        print(nums)
-        nums[1::2] = sorted(nums[::2])[::-1]
-        print(nums)
-    except:
-        error_messages_display()
+    d ={1:0}
+    d.removed
+    '''

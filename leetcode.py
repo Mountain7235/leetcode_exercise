@@ -4358,6 +4358,37 @@ class LeetCode_Medium:
 
         return n + 3 - n % 2
 
+    def partitionLabels(self, s: str) -> List[int]:
+        '''
+        :param s: str
+        :return: List[int]
+
+        leetcode medium: 763. Partition Labels
+
+        Input: s = "ababcbacadefegdehijhklij"
+        Output: [9,7,8]
+        Explanation:
+        The partition is "ababcbaca", "defegde", "hijhklij".
+        This is a partition so that each letter appears in at most one part.
+        A partition like "ababcbacadefegde", "hijhklij" is incorrect, because it splits s into less parts.
+        '''
+        flag, start = -1, 0
+        ans, seen = [], set()
+
+        for idx, char in enumerate(s):
+            if char not in seen:
+                seen.add(char)
+                last = s.rfind(char)
+
+                if last > flag:
+                    flag = last
+
+            if flag == idx:
+                ans.append(flag - start + 1)
+                start = flag + 1
+
+        return ans
+
     def letterCasePermutation(self, S):
         '''
         :param S: str
