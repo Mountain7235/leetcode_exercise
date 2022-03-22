@@ -4358,7 +4358,7 @@ class LeetCode_Medium:
 
         return n + 3 - n % 2
 
-    def partitionLabels(self, s: str) -> List[int]:
+    def partitionLabels(self, s):
         '''
         :param s: str
         :return: List[int]
@@ -4849,7 +4849,7 @@ class LeetCode_Medium:
 
         return dp[m - 1][n - 1]
 
-    def minRemoveToMakeValid(self, s: str) -> str:
+    def minRemoveToMakeValid(self, s):
         '''
         :param s: str
         :return: str
@@ -4998,6 +4998,30 @@ class LeetCode_Medium:
         for _ in range(n):
             a, e, i, o, u = a+e+i+o+u, e+i+o+u, i+o+u, o+u, u
         return a
+
+    def getSmallestString(self, n, k):
+        '''
+        :param n: int
+        :param k: int
+        :return: str
+
+        leetcode medium: 1663. Smallest String With A Given Numeric Value
+
+        Input: n = 3, k = 27
+        Output: "aay"
+        Input: n = 5, k = 73
+        Output: "aaszz"
+        '''
+        diff     = k - n
+        quotient = diff // 25
+        reminder = diff % 25
+
+        # h = "a" * (n - quotient - 1)
+        # m = chr(97 + reminder) if quotient != n else ''
+        # e = "z" * quotient
+        # ans = h + m + e -->
+
+        return "a" * (n - quotient - 1) + (chr(97 + reminder) if quotient != n else '') + "z" * quotient
 
     def findBall(self, grid):
         '''
@@ -7039,6 +7063,7 @@ class Google:
 
 if __name__ == '__main__':
     # good youtuber careference https://www.youtube.com/c/CSDojo/featured
+    # unit testing :  https://dysonma.github.io/
     # stack solution [316,394,946]
 
     easy_list   = [function for function in dir(LeetCode_Easy) if function.startswith('__') is False]
