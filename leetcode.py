@@ -5049,6 +5049,26 @@ class LeetCode_Medium:
 
         return answer
 
+    def minimalKSum(self, nums, k):
+        '''
+        :param nums: List[int]
+        :param k: int
+        :return: int
+
+        leetcode medium: 2195. Append K Integers With Minimal Sum
+
+        Input: nums = [1,4,25,10,25], k = 2
+        Output: 5
+        '''
+        total, subtract = k, 0
+
+        for num in sorted(set(nums)):
+            if num <= total:
+                total += 1
+                subtract += num
+
+        return (total * (total + 1)) // 2 - subtract
+
 class LeetCode_Hard:
     def findMedianSortedArrays(self, nums1, nums2):
         '''
