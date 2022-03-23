@@ -5,6 +5,7 @@ import logging
 import unittest
 import traceback
 import importlib
+from sortedcontainers import SortedList
 
 # region Non using module
 '''
@@ -110,7 +111,18 @@ def reverseList(head):
         current.next = prev
         prev = current
     return prev
+'''
+class test_Fibonacci(unittest.TestCase):
+    def test_output_is_int_type(self):
+        num = 1
+        result = Fibonacci_2(num)
+        self.assertTrue(type(result), int)
 
+    def test_output_is_3(self):
+        num = 3
+        result = Fibonacci_2(num)
+        self.assertEqual(result, 2)
+'''
 # endregion
 
 # region Base Function
@@ -575,3 +587,7 @@ if __name__ == '__main__':
     d ={1:0}
     d.removed
     '''
+
+    a = 's'
+    assert type(a) == str
+

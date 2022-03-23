@@ -4607,10 +4607,10 @@ class LeetCode_Medium:
 
         return stack == []
 
-    def brokenCalc(self, X, Y):
+    def brokenCalc(self, startValue, target):
         '''
-        :param X: int
-        :param Y: int
+        :param startValue : int
+        :param target: int
         :return: int
         leetcode medium: 991. Broken Calculator
         Input: X = 2, Y = 3
@@ -4626,30 +4626,21 @@ class LeetCode_Medium:
                 return 1 + self.brokenCalc(X, Y // 2)
             if Y % 2 == 1:
                 return 2 + self.brokenCalc(X, (Y + 1) // 2)            
-        
-        Bit manipulation, O(log log n)
-        def brokenCalc(self, X: int, Y: int) -> int:
-            count = 0
-            while Y > X:
-                if Y&1:
-                    Y += 1
-                    count += 1
-                Y >>= 1
-                count += 1
-                
-            return count + X-Y     
         '''
 
+        # Bit manipulation, O(log log n)
         count = 0
-        while X < Y:
+
+        while target > startValue:
+            if target & 1:
+                target += 1
+                count += 1
+
+            target >>= 1
+
             count += 1
 
-            if Y % 2:
-                Y += 1
-            else:
-                Y //= 2
-
-        return X - Y + count
+        return count + startValue - target
 
     def orangesRotting(self, grid):
         '''
@@ -5048,26 +5039,6 @@ class LeetCode_Medium:
                 answer[i] += grid[r][c]
 
         return answer
-
-    def minimalKSum(self, nums, k):
-        '''
-        :param nums: List[int]
-        :param k: int
-        :return: int
-
-        leetcode medium: 2195. Append K Integers With Minimal Sum
-
-        Input: nums = [1,4,25,10,25], k = 2
-        Output: 5
-        '''
-        total, subtract = k, 0
-
-        for num in sorted(set(nums)):
-            if num <= total:
-                total += 1
-                subtract += num
-
-        return (total * (total + 1)) // 2 - subtract
 
 class LeetCode_Hard:
     def findMedianSortedArrays(self, nums1, nums2):
